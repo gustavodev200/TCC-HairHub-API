@@ -1,5 +1,3 @@
-import { Status } from "../dtos/ServiceDTO";
-
 export interface HttpResponse<T> {
   statusCode: HttpStatusCode;
   body: T;
@@ -18,21 +16,6 @@ export enum HttpStatusCode {
   SERVER_ERROR = 500,
 }
 
-export interface IController {
-  handle(httpRequest: HttpRequest<unknown>): Promise<HttpResponse<unknown>>;
-}
-
-export const userStatusToBoolean = (status: Status): boolean => {
-  switch (status) {
-    case Status.Ativo:
-      return true;
-    case Status.Inativo:
-      return false;
-    default:
-      throw new Error(`Status ${status} inválido`);
-  }
-};
-
-export const booleanToUserStatus = (status: boolean): Status => {
-  return status ? Status.Ativo : Status.Inativo;
-};
+// export interface IController {
+//   handle(httpRequest: HttpRequest<unknown>): Promise<HttpResponse<unknown>>;
+// }

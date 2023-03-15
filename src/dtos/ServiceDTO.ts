@@ -8,7 +8,7 @@ export interface IServiceInputDTO {
   name: string;
   price: number;
   time: number;
-  status: Status;
+  status: boolean;
 }
 
 export interface IServiceOutputDTO {

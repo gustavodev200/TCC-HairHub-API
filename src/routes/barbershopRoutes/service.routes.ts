@@ -1,11 +1,8 @@
 import { Router } from "express";
 
 import { CreateServiceController } from "../../controllers/barbershop/services/createService/CreateService";
-import { MysqlCreateServiceModel } from "../../models/barbershop/services/createService/MysqlCreateService";
 
-const createServiceController = new CreateServiceController(
-  new MysqlCreateServiceModel()
-);
+const createServiceController = new CreateServiceController();
 
 const serviceRoutes = Router();
 

@@ -9,8 +9,8 @@ export class MysqlCreateServiceModel implements ICreateServiceModel {
   public async createService(
     data: IServiceInputDTO
   ): Promise<IServiceOutputDTO> {
-    const service = await prisma.service.create({ data });
+    const newService = await prisma.service.create({ data });
 
-    return service;
+    return newService;
   }
 }

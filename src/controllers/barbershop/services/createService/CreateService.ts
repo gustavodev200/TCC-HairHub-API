@@ -1,33 +1,23 @@
+import { Request, Response } from "express";
 import {
   IServiceInputDTO,
   IServiceOutputDTO,
 } from "../../../../dtos/ServiceDTO";
+import { MysqlCreateServiceModel } from "../../../../models/barbershop/services/createService/MysqlCreateService";
 
-import {
-  responseBadRequest,
-  responseCreated,
-  responseServerError,
-} from "../../../helpers";
-import { HttpRequest, HttpResponse, IController } from "../../../protocols";
-import { ICreateServiceModel } from "./Protocols";
-
-export class CreateServiceController implements IController {
-  constructor(private readonly createServiceModel: ICreateServiceModel) {}
-
-  public async handle(
-    httpRequest: HttpRequest<IServiceInputDTO>
-  ): Promise<HttpResponse<IServiceOutputDTO | string>> {
+export class CreateServiceController {
+  public async handle(req: Request, res: Response) {
     try {
-      const service = await this.createServiceModel.createService(
-        httpRequest.body!
-      );
+      const createServiceModel = new MysqlCreateServiceModel();
+      const service = await createServiceModel.createService(req.body);
+
       if (!service) {
-        return responseBadRequest("Nenhum serviço à bordo! Tente novamente.");
+        return res.status(400).send("Nenhum serviço à bordo! Tente novamente.");
       }
 
-      return responseCreated<IServiceOutputDTO>(service);
+      return res.status(201).json(service);
     } catch (error) {
-      return responseServerError();
+      return res.status(500).json("Algo deu Errado!");
     }
   }
 }
