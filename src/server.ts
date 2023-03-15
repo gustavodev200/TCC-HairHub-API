@@ -1,5 +1,6 @@
 import express from "express";
 import { config } from "dotenv";
+import { routes } from "./routes";
 
 const main = async () => {
   config();
@@ -7,9 +8,11 @@ const main = async () => {
 
   server.use(express.json());
 
+  server.use(routes);
+
   const port = process.env.PORT || 8000;
 
-  server.listen(port, () => console.log(`Server is running in port ${port}`));
+  server.listen(port, () => console.log(`App is running 🚀`));
 };
 
 main();
