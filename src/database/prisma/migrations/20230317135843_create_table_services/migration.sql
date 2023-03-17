@@ -3,7 +3,7 @@ CREATE TABLE `services` (
     `id` VARCHAR(191) NOT NULL,
     `image` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `price` DECIMAL(65, 30) NOT NULL,
+    `price` INTEGER NOT NULL,
     `time` INTEGER NOT NULL,
     `status` BOOLEAN NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),

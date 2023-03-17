@@ -11,7 +11,7 @@ model Service {
     id         String   @id @default(uuid())
     image      String
     name       String
-    price      Decimal
+    price      Int
     time       Int
     status     Boolean
     created_at DateTime @default(now())

@@ -4,13 +4,18 @@ import {
   IServiceInputDTO,
   IServiceOutputDTO,
 } from "../../../../dtos/ServiceDTO";
+import { AppError } from "../../../../errors/AppError";
 
 export class MysqlCreateServiceModel implements ICreateServiceModel {
   public async createService(
     data: IServiceInputDTO
   ): Promise<IServiceOutputDTO> {
-    const newService = await prisma.service.create({ data });
+    const service = await prisma.service.create({ data });
 
-    return newService;
+    if (!service) {
+      throw new AppError("Erro ao criar Serviço! Tente novamente mais tarde.");
+    }
+
+    return service;
   }
 }

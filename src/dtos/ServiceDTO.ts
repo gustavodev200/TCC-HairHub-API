@@ -18,6 +18,6 @@ export interface IServiceOutputDTO {
   price: number;
   time: number;
   status: boolean;
-  createdAt: Date;
-  updateAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
