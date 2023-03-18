@@ -3,7 +3,7 @@ import {
   IServiceInputDTO,
   IServiceOutputDTO,
 } from "../../../../dtos/ServiceDTO";
-import { MysqlCreateServiceModel } from "../../../../models/barbershop/services/createService/MysqlCreateService";
+import { MysqlCreateServiceModel } from "../../../../models/barbershop/services/createService/MysqlCreateServiceModel";
 
 export class CreateServiceController {
   public async handle(req: Request, res: Response) {

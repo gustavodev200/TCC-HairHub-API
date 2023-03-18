@@ -1,8 +1,3 @@
-export enum Status {
-  Ativo = "ativo",
-  Inativo = "inativo",
-}
-
 export interface IServiceInputDTO {
   image: string;
   name: string;
