@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { CreateServiceController } from "../../controllers/barbershop/services/createService/CreateServiceController";
+import { CreateServiceController } from "../../controllers/barbershop/servicesBarbershop/createService/CreateServiceController";
 
 const createServiceController = new CreateServiceController();
 

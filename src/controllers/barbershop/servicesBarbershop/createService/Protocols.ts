@@ -3,6 +3,6 @@ import {
   IServiceOutputDTO,
 } from "../../../../dtos/ServiceDTO";
 
-export interface ICreateServiceModel {
+export interface ICreateServiceRepository {
   createService(data: IServiceInputDTO): Promise<IServiceOutputDTO>;
 }

@@ -11,11 +11,21 @@ model Service {
     id         String   @id @default(uuid())
     image      String
     name       String
-    price      Int
+    price      Float
     time       Int
-    status     Boolean
+    status     Boolean  @default(true)
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
 
     @@map("services")
+}
+
+model User {
+    id         String   @id @default(uuid())
+    email      String   @unique
+    password   String
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@map("users")
 }

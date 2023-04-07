@@ -3,7 +3,6 @@ export interface IServiceInputDTO {
   name: string;
   price: number;
   time: number;
-  status: boolean;
 }
 
 export interface IServiceOutputDTO {
