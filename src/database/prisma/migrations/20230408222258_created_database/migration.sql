@@ -5,7 +5,7 @@ CREATE TABLE `services` (
     `image` VARCHAR(191) NOT NULL,
     `time` INTEGER NOT NULL,
     `price` DOUBLE NOT NULL,
-    `status` BOOLEAN NOT NULL DEFAULT true,
+    `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 

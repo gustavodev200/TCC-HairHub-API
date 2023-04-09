@@ -7,13 +7,18 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum Status {
+    active
+    inactive
+}
+
 model Service {
     id         String   @id @default(uuid())
     name       String   @unique
     image      String
     time       Int
     price      Float
-    status     Boolean  @default(true)
+    status     Status   @default(active)
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
 

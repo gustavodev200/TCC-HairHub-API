@@ -40,7 +40,7 @@ export class ServiceRepository implements IRepository {
       },
     });
 
-    return createdService;
+    return createdService as IServiceOutputDTO;
   }
   public async update(
     id: string,

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { AppError } from "../../errors/AppError";
+import { GenericStatus } from "../dtos";
 
 export class Service {
   constructor(
@@ -7,12 +8,16 @@ export class Service {
     private _image: string,
     private _time: number,
     private _price: number,
-    private _status?: boolean,
-    private _id?: string
+    private _id?: string,
+    private _status?: GenericStatus
   ) {}
 
   get id() {
     return this._id!;
+  }
+
+  get status() {
+    return this._status!;
   }
 
   get image() {
@@ -31,10 +36,6 @@ export class Service {
     return this._time;
   }
 
-  get status() {
-    return this._status!;
-  }
-
   set id(id: string) {
     this._id = id;
   }
@@ -43,7 +44,7 @@ export class Service {
     this._image = image;
   }
 
-  set status(status: boolean) {
+  set status(status: GenericStatus) {
     this._status = status;
   }
 
@@ -74,7 +75,10 @@ export class Service {
     const serviceSchema = z
       .object({
         id: z.string().uuid("id inválido"),
-        status: z.boolean(),
+        status: z.enum([GenericStatus.active, GenericStatus.inactive], {
+          errorMap: () =>
+            new AppError(`'${this._status}' não é um status válido`),
+        }),
         name: z
           .string()
           .min(3, "Nome deve conter pelo menos 3 caracteres")

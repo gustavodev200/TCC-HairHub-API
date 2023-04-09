@@ -1,9 +1,11 @@
+import { GenericStatus } from "./Status";
+
 export interface IUpdateServiceParams {
   name?: string;
   image?: string;
   time?: number;
   price?: number;
-  status?: boolean;
+  status?: GenericStatus;
 }
 
 export interface IServiceInputDTO
@@ -18,7 +20,7 @@ export interface IServiceOutputDTO {
   image: string;
   time: number;
   price: number;
-  status: boolean;
+  status: GenericStatus;
   created_at: Date;
   updated_at: Date;
 }

@@ -21,6 +21,8 @@ export class ServiceBarbershop implements IService {
     throw new Error("Method not implemented.");
   }
   public async list(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
-    throw new Error("Method not implemented.");
+    const result = await this.serviceRepository.findAll(args);
+
+    return result;
   }
 }

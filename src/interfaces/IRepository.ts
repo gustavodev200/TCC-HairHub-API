@@ -1,8 +1,10 @@
+import { GenericStatus } from "../models/dtos";
+
 export type FindAllArgs = {
   skip?: number;
   take?: number;
   searchTerm?: string;
-  filterByStatus?: boolean;
+  filterByStatus?: GenericStatus;
 };
 
 export type FindAllReturn = {
