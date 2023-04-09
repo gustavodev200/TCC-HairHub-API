@@ -1,2 +1,2 @@
-export * from "./CreateServiceRepository";
-export * from "./ListServiceRepository";
+export * from "./ServiceRepository";
+export * from "./ServiceRepository";

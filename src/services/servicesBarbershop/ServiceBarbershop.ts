@@ -1,5 +1,6 @@
 import { IService } from "../../interfaces";
 import { FindAllArgs, FindAllReturn } from "../../interfaces/IRepository";
+import { GenericStatus } from "../../models/dtos";
 import {
   IServiceInputDTO,
   IUpdateServiceParams,
@@ -14,12 +15,19 @@ export class ServiceBarbershop implements IService {
 
     return service;
   }
+
   public async update(id: string, data: IUpdateServiceParams) {
-    throw new Error("Method not implemented.");
+    const updatedService = await this.serviceRepository.update(id, data);
+
+    return updatedService;
   }
-  public async changeStatus(id: string, status: string) {
-    throw new Error("Method not implemented.");
+
+  public async changeStatus(id: string, status: GenericStatus) {
+    const updatedService = await this.serviceRepository.update(id, { status });
+
+    return updatedService;
   }
+
   public async list(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
     const result = await this.serviceRepository.findAll(args);
 
