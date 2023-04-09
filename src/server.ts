@@ -3,6 +3,7 @@ import express, { NextFunction, Request, Response } from "express";
 import { config } from "dotenv";
 import { routes } from "./routes";
 import { AppError } from "./errors/AppError";
+import cors from "cors";
 
 const main = async () => {
   config();
@@ -11,6 +12,8 @@ const main = async () => {
   server.use(express.json());
 
   server.use(routes);
+
+  server.use(cors());
 
   server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof AppError) {
