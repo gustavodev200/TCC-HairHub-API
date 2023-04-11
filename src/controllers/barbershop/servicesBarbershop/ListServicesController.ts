@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ServiceBarbershop } from "../../../services/servicesBarbershop/ServiceBarbershop";
 import { IServiceOutputDTO } from "../../../models/dtos";
-import { PaginatedResponse } from "../../../utils/PaginationResponse";
+import { PaginatedResponse } from "../../../utils";
 
 export class ListServiceController {
   public async handle(req: Request, res: Response) {

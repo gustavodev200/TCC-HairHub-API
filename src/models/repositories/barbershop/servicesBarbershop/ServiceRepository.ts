@@ -1,10 +1,6 @@
 import { prisma } from "../../..";
 import { AppError } from "../../../../errors/AppError";
-import {
-  FindAllArgs,
-  FindAllReturn,
-  IRepository,
-} from "../../../../interfaces/IRepository";
+import { FindAllArgs, IRepository } from "../../../../interfaces/IRepository";
 import { Service } from "../../../domains";
 import {
   GenericStatus,
@@ -14,12 +10,10 @@ import {
 } from "../../../dtos";
 
 export class ServiceRepository implements IRepository {
-  public async create({
-    name,
-    image,
-    time,
-    price,
-  }: IServiceInputDTO): Promise<IServiceOutputDTO> {
+  public async create(
+    { name, time, image, price }: IServiceInputDTO,
+    imageURL: string
+  ): Promise<IServiceOutputDTO> {
     const existingService = await prisma.service.findUnique({
       where: { name },
     });
@@ -28,7 +22,7 @@ export class ServiceRepository implements IRepository {
       throw new AppError("O serviço já existe! Tente novamente.");
     }
 
-    const service = new Service(name, image, time, price);
+    const service = new Service(name, (image = imageURL), time, price);
 
     service.validate();
 
