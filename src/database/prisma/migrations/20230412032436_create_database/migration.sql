@@ -2,7 +2,7 @@
 CREATE TABLE `services` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `image` VARCHAR(191) NOT NULL,
+    `image` VARCHAR(191) NULL,
     `time` INTEGER NOT NULL,
     `price` DOUBLE NOT NULL,
     `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'active',

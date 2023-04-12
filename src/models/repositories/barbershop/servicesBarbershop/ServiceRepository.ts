@@ -10,10 +10,11 @@ import {
 } from "../../../dtos";
 
 export class ServiceRepository implements IRepository {
-  public async create(
-    { name, time, image, price }: IServiceInputDTO,
-    imageURL: string
-  ): Promise<IServiceOutputDTO> {
+  public async create({
+    name,
+    time,
+    price,
+  }: IServiceInputDTO): Promise<IServiceOutputDTO> {
     const existingService = await prisma.service.findUnique({
       where: { name },
     });
@@ -22,14 +23,13 @@ export class ServiceRepository implements IRepository {
       throw new AppError("O serviço já existe! Tente novamente.");
     }
 
-    const service = new Service(name, (image = imageURL), time, price);
+    const service = new Service(name, time, price);
 
     service.validate();
 
     const createdService = await prisma.service.create({
       data: {
         name: service.name,
-        image: service.image,
         time: service.time,
         price: service.price,
       },
@@ -45,7 +45,6 @@ export class ServiceRepository implements IRepository {
 
       const service = new Service(
         serviceToUpdate.name,
-        serviceToUpdate.image,
         serviceToUpdate.time,
         serviceToUpdate.price,
         serviceToUpdate.id,
@@ -53,7 +52,6 @@ export class ServiceRepository implements IRepository {
       );
 
       if (data.name !== undefined) service.name = data.name;
-      if (data.image !== undefined) service.image = data.image;
       if (data.time !== undefined) service.time = data.time;
       if (data.price !== undefined) service.price = data.price;
       if (data.status !== undefined) service.status = data.status;
@@ -64,7 +62,6 @@ export class ServiceRepository implements IRepository {
         where: { id },
         data: {
           name: service.name,
-          image: service.image,
           time: service.time,
           price: service.price,
           status: service.status,

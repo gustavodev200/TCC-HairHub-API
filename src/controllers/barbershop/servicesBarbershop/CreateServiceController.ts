@@ -1,18 +1,16 @@
 import { Request, Response } from "express";
 import { ServiceBarbershop } from "../../../services/servicesBarbershop/ServiceBarbershop";
 import { Cloudinary } from "../../../utils";
+import { IServiceInputDTO } from "../../../models/dtos";
 
 export class CreateServiceController {
   public async handle(req: Request, res: Response) {
-    const data = req.body;
-    const localFilePath = req.file?.path || "";
+    const data = req.body as IServiceInputDTO;
+    const file = req.file;
 
-    const cloudinaryInstance = new Cloudinary();
     const serviceBarbershop = new ServiceBarbershop();
 
-    const { imageURL } = await cloudinaryInstance.uploadImage(localFilePath);
-
-    const service = await serviceBarbershop.create(data, imageURL!);
+    const service = await serviceBarbershop.create(data);
 
     return res.status(201).json(service);
   }

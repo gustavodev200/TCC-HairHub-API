@@ -5,7 +5,6 @@ import { GenericStatus } from "../dtos";
 export class Service {
   constructor(
     private _name: string,
-    private _image: string,
     private _time: number,
     private _price: number,
     private _id?: string,
@@ -18,10 +17,6 @@ export class Service {
 
   get status() {
     return this._status!;
-  }
-
-  get image() {
-    return this._image;
   }
 
   get name() {
@@ -38,10 +33,6 @@ export class Service {
 
   set id(id: string) {
     this._id = id;
-  }
-
-  set image(image: string) {
-    this._image = image;
   }
 
   set status(status: GenericStatus) {
@@ -64,7 +55,6 @@ export class Service {
     return {
       id: this.id,
       name: this.name,
-      image: this.image,
       time: this.time,
       price: this.price,
       status: this.status,

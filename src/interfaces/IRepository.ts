@@ -13,7 +13,7 @@ export type FindAllReturn = {
 };
 
 export interface IRepository {
-  create(data: unknown, imageUrl?: unknown): Promise<unknown>;
+  create(data: unknown): Promise<unknown>;
   update(id: string, data: unknown): Promise<unknown>;
   findAll(args?: FindAllArgs): Promise<FindAllReturn>;
 }

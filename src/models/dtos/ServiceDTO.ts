@@ -2,7 +2,6 @@ import { GenericStatus } from "./Status";
 
 export interface IUpdateServiceParams {
   name?: string;
-  image?: string;
   time?: number;
   price?: number;
   status?: GenericStatus;
@@ -17,7 +16,6 @@ export interface IServiceInputDTO
 export interface IServiceOutputDTO {
   id: string;
   name: string;
-  image: string;
   time: number;
   price: number;
   status: GenericStatus;

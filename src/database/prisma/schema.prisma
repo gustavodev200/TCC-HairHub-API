@@ -15,7 +15,7 @@ enum Status {
 model Service {
     id         String   @id @default(uuid())
     name       String   @unique
-    image      String
+    image      String?
     time       Int
     price      Float
     status     Status   @default(active)

@@ -10,8 +10,8 @@ import { ServiceRepository } from "../../models/repositories/barbershop/services
 export class ServiceBarbershop implements IService {
   private serviceRepository = new ServiceRepository();
 
-  public async create(data: IServiceInputDTO, imageUrl: string) {
-    const service = await this.serviceRepository.create(data, imageUrl);
+  public async create(data: IServiceInputDTO) {
+    const service = await this.serviceRepository.create(data);
 
     return service;
   }
