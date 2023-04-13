@@ -5,6 +5,7 @@ import { GenericStatus } from "../dtos";
 export class Service {
   constructor(
     private _name: string,
+    private _image: string,
     private _time: number,
     private _price: number,
     private _id?: string,
@@ -23,12 +24,16 @@ export class Service {
     return this._name;
   }
 
-  get price() {
-    return this._price;
+  get image() {
+    return this._image;
   }
 
   get time() {
     return this._time;
+  }
+
+  get price() {
+    return Number(this._price);
   }
 
   set id(id: string) {
@@ -43,18 +48,23 @@ export class Service {
     this._name = name;
   }
 
-  set price(price: number) {
-    this._price = price;
+  set image(image: string) {
+    this._image = image;
   }
 
   set time(time: number) {
     this._time = time;
   }
 
+  set price(price: number) {
+    this._price = price;
+  }
+
   toJSON() {
     return {
       id: this.id,
       name: this.name,
+      image: this.image,
       time: this.time,
       price: this.price,
       status: this.status,
@@ -83,7 +93,7 @@ export class Service {
     try {
       serviceSchema.parse(this);
     } catch (err) {
-      throw new AppError("Erro tente novamente mais tarde!");
+      throw new AppError(`Erro tente novamente mais tarde! - ${err}`);
     }
   }
 }
