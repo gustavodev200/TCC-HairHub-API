@@ -1,19 +1,23 @@
+import cors from "cors";
 import "express-async-errors";
 import express, { NextFunction, Request, Response } from "express";
 import { config } from "dotenv";
 import { routes } from "./routes";
 import { AppError } from "./errors/AppError";
-import cors from "cors";
 
 const main = async () => {
   config();
+
+  const corsOptions = {
+    origin: "http://localhost:3000",
+    credentials: true, //access-control-allow-credentials:true
+    optionSuccessStatus: 200,
+  };
+
   const server = express();
-
+  server.use(cors(corsOptions));
   server.use(express.json());
-
   server.use(routes);
-
-  server.use(cors());
 
   server.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err instanceof AppError) {
@@ -31,7 +35,11 @@ const main = async () => {
 
   const port = process.env.PORT || 8000;
 
-  server.listen(port, () => console.log(`App is running 🚀`));
+  server.listen(port, () =>
+    console.log(
+      `\n🚀 Server \x1b[32mstarted\x1b[0m on port \x1b[1m\x1b[36m${process.env.PORT}\x1b[0m`
+    )
+  );
 };
 
 main();
