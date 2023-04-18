@@ -103,6 +103,10 @@ export class ServiceRepository implements IRepository {
       where,
       skip: args?.skip,
       take: args?.take,
+
+      orderBy: {
+        status: "asc",
+      },
     });
 
     return {

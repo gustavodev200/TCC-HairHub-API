@@ -8,6 +8,7 @@ export class CreateServiceController {
   public async handle(req: Request, res: Response) {
     let data = req.body as IServiceInputDTO;
     const localFilePath = req.file?.path;
+    // const localFilePath = req.file?.buffer;
 
     if (!localFilePath) {
       throw new AppError("Erro ao mandar imagem!");
