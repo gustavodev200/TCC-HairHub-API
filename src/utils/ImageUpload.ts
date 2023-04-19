@@ -2,6 +2,7 @@ import multer from "multer";
 import path from "path";
 import * as fs from "fs";
 import { Request } from "express";
+import { ErrorMessages } from "../errors";
 
 export class UploadImage {
   private URL: string = path.join(__dirname, "../uploads");
@@ -30,11 +31,7 @@ export class UploadImage {
       cb: multer.FileFilterCallback
     ) => {
       if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
-        return cb(
-          new Error(
-            "Por favor, envie apenas arquivos com extensões .jpg, .png e .jpeg"
-          )
-        );
+        return cb(new Error(ErrorMessages.MSGE13));
       }
 
       cb(null, true);
@@ -48,32 +45,3 @@ export class UploadImage {
     };
   }
 }
-
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     if (!fs.existsSync("src/uploads")) {
-//       fs.mkdirSync("src/uploads");
-//     }
-//     cb(null, "src/uploads");
-//   },
-
-//   filename: (req, file, cb) => {
-//     cb(null, `${Date.now()}-${file.originalname}`);
-//   },
-// });
-
-// const fileFilter = (
-//   req: Request,
-//   file: Express.Multer.File,
-//   cb: multer.FileFilterCallback
-// ) => {
-//   if (!file.originalname.match(/\.(png|jpg|jpeg)$/)) {
-//     return cb(new Error("Por favor, envie apenas jpg ou png!"));
-//   }
-//   cb(null, true);
-// };
-
-// export const upload = multer({
-//   storage,
-//   fileFilter,
-// });

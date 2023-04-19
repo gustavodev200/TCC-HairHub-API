@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { AppError } from "../../errors/AppError";
 import { GenericStatus } from "../dtos";
+import { ErrorMessages } from "../../errors";
 
 export class Service {
   constructor(
@@ -76,17 +77,18 @@ export class Service {
       .object({
         id: z.string().uuid("id inválido"),
         status: z.enum([GenericStatus.active, GenericStatus.inactive], {
-          errorMap: () =>
-            new AppError(`'${this._status}' não é um status válido`),
+          errorMap: () => new AppError(ErrorMessages.MSGE06),
         }),
         name: z
           .string()
-          .min(3, "Nome deve conter pelo menos 3 caracteres")
-          .max(120, "Nome não deve ser maior que 120 caracteres"),
+          .min(3, ErrorMessages.MSGE08)
+          .max(120, ErrorMessages.MSGE09),
         price: z
-          .number()
-          .min(1, "Preço do serviço não deve ser menor que 1")
-          .max(999, "Preço do serviço não deve ser maior que 999"),
+          .number({
+            required_error: ErrorMessages.MSGE01,
+          })
+          .min(1, ErrorMessages.MSGE10)
+          .max(999, ErrorMessages.MSGE11),
       })
       .partial({ id: true, status: true });
 

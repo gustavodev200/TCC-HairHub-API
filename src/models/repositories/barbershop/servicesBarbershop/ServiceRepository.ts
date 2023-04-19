@@ -1,5 +1,5 @@
 import { prisma } from "../../..";
-import { AppError } from "../../../../errors/AppError";
+import { AppError, ErrorMessages } from "../../../../errors";
 import { FindAllArgs, IRepository } from "../../../../interfaces/IRepository";
 import { Service } from "../../../domains";
 import {
@@ -21,7 +21,7 @@ export class ServiceRepository implements IRepository {
     });
 
     if (existingService) {
-      throw new AppError("O serviço já existe! Tente novamente.");
+      throw new AppError(ErrorMessages.MSGE02);
     }
 
     const service = new Service(name, image, time, price);
@@ -68,7 +68,7 @@ export class ServiceRepository implements IRepository {
         });
 
         if (alreadyExists) {
-          throw new AppError("Já existe em nossa base de dados!", 404);
+          throw new AppError(ErrorMessages.MSGE02);
         }
       }
       const updatedService = await prisma.service.update({
@@ -86,7 +86,7 @@ export class ServiceRepository implements IRepository {
     } catch (error) {
       if (error instanceof AppError || error instanceof Error) throw error;
 
-      throw new AppError("Algo deu errado! Tente novamente.", 404);
+      throw new AppError(ErrorMessages.MSGE05, 404);
     }
   }
 

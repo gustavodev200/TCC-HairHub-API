@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { IService } from "../interfaces";
-import { AppError } from "../errors/AppError";
 import { GenericStatus, PaginatedDataResponseDTO } from "../models/dtos";
+import { AppError } from "../errors";
 
 export class PaginatedResponse<T> {
   constructor(private service: IService) {}
@@ -18,12 +18,6 @@ export class PaginatedResponse<T> {
     if (req.query.pageSize && isNaN(Number(req.query.pageSize))) {
       throw new AppError("O tamanho da página deve ser um número");
     }
-
-    // if (typeof req.query.query === "string" && req.query.query.length < 3) {
-    //   throw new AppError(
-    //     "O termo de busca deve conter pelo menos 3 caracteres"
-    //   );
-    // }
 
     if (
       typeof req.query.filterByStatus === "string" &&

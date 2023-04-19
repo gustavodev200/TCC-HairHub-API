@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { IServiceOutputDTO } from "../../../models/dtos";
 import { ServiceBarbershop } from "../../../services/servicesBarbershop/ServiceBarbershop";
 import { UpdateNewImage } from "../../../utils";
-import { AppError } from "../../../errors/AppError";
 import { prisma } from "../../../models";
+import { AppError, ErrorMessages } from "../../../errors";
 
 export class UpdateServiceController {
   public async handle(req: Request, res: Response) {
@@ -24,7 +24,7 @@ export class UpdateServiceController {
       });
 
       if (alreadyExists) {
-        throw new AppError("Já existe em nossa base de dados!", 404);
+        throw new AppError(ErrorMessages.MSGE02, 404);
       }
     }
 

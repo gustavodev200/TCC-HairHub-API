@@ -4,6 +4,7 @@ import { Cloudinary } from "../../../utils";
 import { IServiceInputDTO } from "../../../models/dtos";
 import { AppError } from "../../../errors/AppError";
 import { prisma } from "../../../models";
+import { ErrorMessages } from "../../../errors";
 
 export class CreateServiceController {
   public async handle(req: Request, res: Response) {
@@ -11,7 +12,7 @@ export class CreateServiceController {
     const localFilePath = req.file?.path;
 
     if (!localFilePath) {
-      throw new AppError("Erro ao mandar imagem!");
+      throw new AppError(ErrorMessages.MSGE06);
     }
 
     const cloudinaryInstance = new Cloudinary();
@@ -21,7 +22,7 @@ export class CreateServiceController {
     });
 
     if (alreadyExists) {
-      throw new AppError("Já existe em nossa base de dados!", 404);
+      throw new AppError(ErrorMessages.MSGE02, 404);
     }
 
     const { imageURL } = await cloudinaryInstance.uploadImage(localFilePath);
