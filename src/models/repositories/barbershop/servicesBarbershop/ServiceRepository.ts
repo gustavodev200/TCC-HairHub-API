@@ -62,6 +62,15 @@ export class ServiceRepository implements IRepository {
 
       service.validate();
 
+      if (service.name !== serviceToUpdate.name) {
+        const alreadyExists = await prisma.service.findUnique({
+          where: { name: data.name },
+        });
+
+        if (alreadyExists) {
+          throw new AppError("Já existe em nossa base de dados!", 404);
+        }
+      }
       const updatedService = await prisma.service.update({
         where: { id },
         data: {
@@ -75,7 +84,7 @@ export class ServiceRepository implements IRepository {
 
       return updatedService as IServiceOutputDTO;
     } catch (error) {
-      if (error instanceof AppError) throw error;
+      if (error instanceof AppError || error instanceof Error) throw error;
 
       throw new AppError("Algo deu errado! Tente novamente.", 404);
     }
