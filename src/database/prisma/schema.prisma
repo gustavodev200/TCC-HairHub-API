@@ -7,6 +7,12 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+enum AssignmentType {
+    admin
+    employee
+    client
+}
+
 enum Status {
     active
     inactive
@@ -25,12 +31,46 @@ model Service {
     @@map("services")
 }
 
-model User {
-    id         String   @id @default(uuid())
-    email      String   @unique
+model Employee {
+    id         String    @id @default(uuid())
+    name       String
+    image      String
+    cpf        String    @unique
+    dataNasc   DateTime
+    phone      String
+    email      String    @unique
     password   String
+    roles      Role[]
+    address    Address[]
+    created_at DateTime  @default(now())
+    updated_at DateTime  @updatedAt
+
+    @@map("employees")
+}
+
+model Address {
+    id         String   @id @default(uuid())
+    cep        String
+    county     String
+    fu         String
+    district   String
+    street     String
+    number     String?
+    employeeId String
+    employee   Employee @relation(fields: [employeeId], references: [id])
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
 
-    @@map("users")
+    @@map("address")
+}
+
+model Role {
+    id         String         @id @default(uuid())
+    type       AssignmentType
+    employee   Employee       @relation(fields: [employeeId], references: [id])
+    employeeId String
+    created_at DateTime       @default(now())
+    updated_at DateTime       @updatedAt
+
+    @@map("roles")
 }
