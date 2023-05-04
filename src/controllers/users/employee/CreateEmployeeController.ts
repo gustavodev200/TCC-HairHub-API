@@ -12,3 +12,5 @@ export class CreateEmployeeController {
     return res.status(201).json(result);
   }
 }
+
+export default new CreateEmployeeController();

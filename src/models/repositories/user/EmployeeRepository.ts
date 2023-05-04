@@ -1,8 +1,10 @@
+import { sign } from "jsonwebtoken";
 import { prisma } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgs, FindAllReturn, IRepository } from "../../../interfaces";
 import { User } from "../../domains";
 import { EmployeeInputDTO, EmployeeOutputDTO } from "../../dtos";
+import { hash } from "bcrypt";
 
 export class EmployeeRepository implements IRepository {
   async create(data: EmployeeInputDTO): Promise<EmployeeOutputDTO> {
@@ -22,6 +24,8 @@ export class EmployeeRepository implements IRepository {
       throw new AppError(ErrorMessages.MSGE02);
     }
 
+    const hashedPassword = await hash(data.password || "", 8);
+
     const employee = new User(
       data.name,
       data.cpf,
@@ -30,7 +34,7 @@ export class EmployeeRepository implements IRepository {
       data.roles,
       data.address,
       data.email,
-      data.password
+      hashedPassword
     );
 
     employee.validate();
@@ -54,10 +58,47 @@ export class EmployeeRepository implements IRepository {
       include: {
         roles: true,
         address: true,
+        user_token: true,
       },
     });
 
-    return createdEmployee as EmployeeOutputDTO;
+    const token = sign(
+      { id: createdEmployee.id },
+      `${process.env.JWT_SECRET}`,
+      {
+        subject: createdEmployee.id,
+        expiresIn: `${process.env.JWT_EXPIRES_IN}`,
+      }
+    );
+
+    const refreshToken = sign(
+      { id: createdEmployee.id },
+      `${process.env.JWT_SECRET}`,
+      { expiresIn: `${process.env.REFRESH_TOKEN_EXPIRES_IN}` }
+    );
+
+    const userToken = await prisma.userToken.create({
+      data: {
+        refresh_token: refreshToken,
+        employee: {
+          connect: { id: createdEmployee.id },
+        },
+        expires_date: new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000), // adiciona uma data de expiração de 30 dias
+      },
+    });
+
+    return {
+      id: createdEmployee.id,
+      name: createdEmployee.name,
+      cpf: createdEmployee.cpf,
+      dataNasc: createdEmployee.dataNasc,
+      phone: createdEmployee.phone,
+      roles: createdEmployee.roles,
+      address: createdEmployee.address,
+      email: createdEmployee.email,
+      token,
+      refresh_token: userToken.refresh_token,
+    } as unknown as EmployeeOutputDTO;
   }
   async update(id: string, data: unknown): Promise<unknown> {
     throw new Error("Method not implemented.");

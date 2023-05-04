@@ -1,15 +1,18 @@
 import type { Request, Response } from "express";
+import { AuthenticateService } from "../../../services/user";
 
 class AuthenticateController {
-  async handle(request: Request, response: Response) {
-    const { username, password } = request.body;
+  async handle(req: Request, res: Response) {
+    const { email, password } = req.body;
 
-    // const token = await AuthenticateService.execute({
-    //   username,
-    //   password,
-    // });
+    const authenticateService = new AuthenticateService();
 
-    // response.json(token);
+    const { token } = await authenticateService.execute({
+      email,
+      password,
+    });
+
+    res.json({ token });
   }
 }
 

@@ -6,6 +6,13 @@ export enum AssignmentType {
   CLIENT = "client",
 }
 
+//All users interface
+export interface UserInterface {
+  id?: string;
+  email: string;
+  password: string;
+}
+
 // Employee Input DTO
 
 export interface EmployeeInputDTO {

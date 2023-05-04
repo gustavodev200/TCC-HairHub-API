@@ -1,10 +1,13 @@
 import { Router } from "express";
-import { CreateEmployeeController } from "../../controllers/users/employee";
+
+import AuthenticateUserController from "../../controllers/users/employee/AuthenticateUserController";
+import CreateEmployeeController from "../../controllers/users/employee/CreateEmployeeController";
+import RefreshTokenController from "../../controllers/users/employee/RefreshTokenController";
 
 const employeeRoutes = Router();
 
-const createEmployeeController = new CreateEmployeeController();
-
-employeeRoutes.post("/", createEmployeeController.handle);
+employeeRoutes.post("/register", CreateEmployeeController.handle);
+employeeRoutes.post("/signin", AuthenticateUserController.handle);
+employeeRoutes.post("/refresh", RefreshTokenController.handle);
 
 export { employeeRoutes };

@@ -13,4 +13,6 @@ export enum ErrorMessages {
   MSGE12 = "Não é possível enviar sua imagem no momento, Por favor, tente novamente!",
   MSGE13 = "Erro - Por favor, envie apenas arquivos com extensões .jpg, .png e .jpeg",
   MSGE14 = "Erro - CPF inválido!",
+  MSGE15 = "E-mail ou senha incorretos!",
+  MSGE16 = "Não foi possível renovar sua sessão. Faça login novamente!",
 }
