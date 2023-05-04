@@ -12,4 +12,5 @@ export enum ErrorMessages {
   MSGE11 = "Valor do campo maior que o máximo permitido",
   MSGE12 = "Não é possível enviar sua imagem no momento, Por favor, tente novamente!",
   MSGE13 = "Erro - Por favor, envie apenas arquivos com extensões .jpg, .png e .jpeg",
+  MSGE14 = "Erro - CPF inválido!",
 }
