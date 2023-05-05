@@ -48,7 +48,7 @@ export interface EmployeeOutputDTO {
 export interface AddressInputDTO {
   cep: string;
   county: string;
-  fu: string;
+  state: string;
   district: string;
   street: string;
   number?: string;
@@ -57,7 +57,7 @@ export interface AddressOutputDTO {
   id: string;
   cep: string;
   county: string;
-  fu: string;
+  state: string;
   district: string;
   street: string;
   number?: string;
