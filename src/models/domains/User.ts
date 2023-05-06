@@ -2,6 +2,7 @@ import { z } from "zod";
 import { AddressInputDTO, GenericStatus } from "../dtos";
 import { AppError, ErrorMessages } from "../../errors";
 import { AssignmentType } from "@prisma/client";
+import { Address } from "./Address";
 
 export class User {
   constructor(
@@ -10,7 +11,7 @@ export class User {
     private _dataNasc: Date,
     private _phone: string,
     private _role: AssignmentType,
-    private _address: AddressInputDTO,
+    private _address: Address,
     private _email: string,
     private _password: string,
     private _id?: string,
@@ -82,7 +83,7 @@ export class User {
     this._role = role;
   }
 
-  set address(address: AddressInputDTO) {
+  set address(address: Address) {
     this._address = address;
   }
 

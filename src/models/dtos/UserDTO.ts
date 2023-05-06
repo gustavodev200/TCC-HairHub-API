@@ -1,3 +1,4 @@
+import { Address } from "../domains";
 import { GenericStatus } from "./Status";
 
 export enum AssignmentType {
@@ -21,9 +22,8 @@ export interface EmployeeInputDTO {
   dataNasc: Date;
   phone: string;
   email: string;
-  password: string;
   role: AssignmentType;
-  address: AddressInputDTO;
+  address: Address;
 }
 
 // Employee Output DTO
@@ -62,4 +62,6 @@ export interface AddressOutputDTO {
   street: string;
   number?: string;
   employee: EmployeeOutputDTO;
+  created_at: Date;
+  updated_at: Date;
 }
