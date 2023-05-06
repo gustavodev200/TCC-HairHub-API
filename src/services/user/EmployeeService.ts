@@ -16,6 +16,8 @@ export class EmployeeService implements IService {
     throw new Error("Method not implemented.");
   }
   async list(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
-    throw new Error("Method not implemented.");
+    const result = await this.employeeService.findAll(args);
+
+    return result;
   }
 }

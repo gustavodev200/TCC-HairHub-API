@@ -22,8 +22,8 @@ export interface EmployeeInputDTO {
   phone: string;
   email: string;
   password: string;
-  roles: RoleInputDTO[];
-  address: AddressInputDTO[];
+  role: AssignmentType;
+  address: AddressInputDTO;
 }
 
 // Employee Output DTO
@@ -35,10 +35,10 @@ export interface EmployeeOutputDTO {
   dataNasc: Date;
   phone: string;
   email: string;
-  password: string;
   status: GenericStatus;
-  roles: RoleOutputDTO[];
-  address: AddressOutputDTO[];
+  role: AssignmentType;
+  address: AddressOutputDTO;
+  adress_id: string;
   created_at: Date;
   updated_at: Date;
 }
@@ -47,7 +47,7 @@ export interface EmployeeOutputDTO {
 
 export interface AddressInputDTO {
   cep: string;
-  county: string;
+  city: string;
   state: string;
   district: string;
   street: string;
@@ -56,27 +56,10 @@ export interface AddressInputDTO {
 export interface AddressOutputDTO {
   id: string;
   cep: string;
-  county: string;
+  city: string;
   state: string;
   district: string;
   street: string;
   number?: string;
-  employeeId: string;
   employee: EmployeeOutputDTO;
-  created_at: Date;
-  updated_at: Date;
-}
-
-// Role DTO
-
-export interface RoleInputDTO {
-  type: AssignmentType;
-}
-export interface RoleOutputDTO {
-  id: string;
-  type: AssignmentType;
-  employee: EmployeeOutputDTO;
-  employeeId: string;
-  created_at: Date;
-  updated_at: Date;
 }

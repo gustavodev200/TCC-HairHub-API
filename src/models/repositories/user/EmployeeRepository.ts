@@ -1,7 +1,7 @@
-import { sign } from "jsonwebtoken";
 import { prisma } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgs, FindAllReturn, IRepository } from "../../../interfaces";
+import { excludeFields, parseArrayOfData } from "../../../utils";
 import { User } from "../../domains";
 import { EmployeeInputDTO, EmployeeOutputDTO } from "../../dtos";
 import { hash } from "bcrypt";
@@ -31,7 +31,7 @@ export class EmployeeRepository implements IRepository {
       data.cpf,
       data.dataNasc,
       data.phone,
-      data.roles,
+      data.role,
       data.address,
       data.email,
       hashedPassword
@@ -45,9 +45,7 @@ export class EmployeeRepository implements IRepository {
         cpf: employee.cpf,
         dataNasc: new Date(employee.dataNasc),
         phone: employee.phone,
-        roles: {
-          create: employee.roles,
-        },
+        role: employee.role,
         address: {
           create: employee.address,
         },
@@ -56,17 +54,53 @@ export class EmployeeRepository implements IRepository {
         image: employee.image,
       },
       include: {
-        roles: true,
         address: true,
       },
     });
 
-    return createdEmployee as EmployeeOutputDTO;
+    return excludeFields(createdEmployee, [
+      "password",
+      "created_at",
+      "updated_at",
+    ]) as EmployeeOutputDTO;
   }
   async update(id: string, data: unknown): Promise<unknown> {
     throw new Error("Method not implemented.");
   }
   async findAll(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
-    throw new Error("Method not implemented.");
+    const where = {
+      OR: args?.searchTerm
+        ? [
+            {
+              name: {
+                contains: args?.searchTerm,
+              },
+            },
+          ]
+        : undefined,
+      status: {
+        equals: args?.filterByStatus,
+      },
+    };
+
+    const totalItems = await prisma.employee.count({ where });
+
+    const data = await prisma.employee.findMany({
+      where,
+      include: {
+        address: true,
+      },
+      skip: args?.skip,
+      take: args?.take,
+
+      orderBy: {
+        status: "asc",
+      },
+    });
+
+    return {
+      data: parseArrayOfData(data, ["password"]),
+      totalItems,
+    };
   }
 }

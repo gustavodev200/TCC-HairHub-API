@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { AddressInputDTO, GenericStatus, RoleInputDTO } from "../dtos";
+import { AddressInputDTO, GenericStatus } from "../dtos";
 import { AppError, ErrorMessages } from "../../errors";
+import { AssignmentType } from "@prisma/client";
 
 export class User {
   constructor(
@@ -8,8 +9,8 @@ export class User {
     private _cpf: string,
     private _dataNasc: Date,
     private _phone: string,
-    private _roles: RoleInputDTO[],
-    private _address: AddressInputDTO[],
+    private _role: AssignmentType,
+    private _address: AddressInputDTO,
     private _email: string,
     private _password: string,
     private _id?: string,
@@ -34,8 +35,8 @@ export class User {
   get phone() {
     return this._phone;
   }
-  get roles() {
-    return this._roles;
+  get role() {
+    return this._role;
   }
 
   get address() {
@@ -77,11 +78,11 @@ export class User {
     this._phone = phone;
   }
 
-  set roles(roles: RoleInputDTO[]) {
-    this._roles = roles;
+  set role(role: AssignmentType) {
+    this._role = role;
   }
 
-  set address(address: AddressInputDTO[]) {
+  set address(address: AddressInputDTO) {
     this._address = address;
   }
 
@@ -112,7 +113,7 @@ export class User {
       email: this.email,
       password: this.password,
       status: this.status,
-      roles: this.roles,
+      roles: this.role,
       address: this.address,
     };
   }

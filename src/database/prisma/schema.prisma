@@ -32,46 +32,35 @@ model Service {
 }
 
 model Employee {
-    id         String    @id @default(uuid())
+    id         String         @id @default(uuid())
     name       String
     image      String?
-    cpf        String    @unique
+    cpf        String         @unique
     dataNasc   DateTime
     phone      String
-    email      String    @unique
+    email      String         @unique
     password   String
-    status     Status    @default(active)
-    roles      Role[]
-    address    Address[]
-    created_at DateTime  @default(now())
-    updated_at DateTime  @updatedAt
+    status     Status         @default(active)
+    role       AssignmentType @default(employee)
+    address    Address        @relation(fields: [adress_id], references: [id])
+    adress_id  String         @unique
+    created_at DateTime       @default(now())
+    updated_at DateTime       @updatedAt
 
     @@map("employees")
 }
 
 model Address {
-    id         String   @id @default(uuid())
+    id         String    @id @default(uuid())
     cep        String
-    county     String
+    city       String
     state      String
     district   String
     street     String
     number     String?
-    employeeId String
-    employee   Employee @relation(fields: [employeeId], references: [id])
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    employee   Employee?
+    created_at DateTime  @default(now())
+    updated_at DateTime  @updatedAt
 
     @@map("address")
-}
-
-model Role {
-    id         String         @id @default(uuid())
-    type       AssignmentType
-    employee   Employee       @relation(fields: [employeeId], references: [id])
-    employeeId String
-    created_at DateTime       @default(now())
-    updated_at DateTime       @updatedAt
-
-    @@map("roles")
 }
