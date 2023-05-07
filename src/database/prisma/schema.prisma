@@ -42,8 +42,8 @@ model Employee {
     password   String
     status     Status         @default(active)
     role       AssignmentType @default(employee)
-    address    Address        @relation(fields: [adress_id], references: [id])
-    adress_id  String         @unique
+    address    Address        @relation(fields: [address_id], references: [id])
+    address_id String         @unique
     created_at DateTime       @default(now())
     updated_at DateTime       @updatedAt
 

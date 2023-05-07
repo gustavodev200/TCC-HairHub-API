@@ -25,13 +25,13 @@ CREATE TABLE `employees` (
     `password` VARCHAR(191) NOT NULL,
     `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
     `role` ENUM('admin', 'employee', 'client') NOT NULL DEFAULT 'employee',
-    `adress_id` VARCHAR(191) NOT NULL,
+    `address_id` VARCHAR(191) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `employees_cpf_key`(`cpf`),
     UNIQUE INDEX `employees_email_key`(`email`),
-    UNIQUE INDEX `employees_adress_id_key`(`adress_id`),
+    UNIQUE INDEX `employees_address_id_key`(`address_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -51,4 +51,4 @@ CREATE TABLE `address` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `employees` ADD CONSTRAINT `employees_adress_id_fkey` FOREIGN KEY (`adress_id`) REFERENCES `address`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `employees` ADD CONSTRAINT `employees_address_id_fkey` FOREIGN KEY (`address_id`) REFERENCES `address`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -1,4 +1,5 @@
 import { Address } from "../domains";
+import { AddressInputDTO } from "./AddressDTO";
 import { GenericStatus } from "./Status";
 
 export enum AssignmentType {
@@ -14,16 +15,27 @@ export interface UserInterface {
   password: string;
 }
 
+export interface IUpdateEmployeeParams {
+  name?: string;
+  cpf?: string;
+  dataNasc?: string;
+  phone?: string;
+  email?: string;
+  role?: AssignmentType;
+  address?: Address;
+}
+
 // Employee Input DTO
 
 export interface EmployeeInputDTO {
+  cep: string;
   name: string;
   cpf: string;
-  dataNasc: Date;
+  dataNasc: string;
   phone: string;
   email: string;
   role: AssignmentType;
-  address: Address;
+  address: AddressInputDTO;
 }
 
 // Employee Output DTO
@@ -32,7 +44,7 @@ export interface EmployeeOutputDTO {
   name: string;
   image?: string;
   cpf: string;
-  dataNasc: Date;
+  dataNasc: string;
   phone: string;
   email: string;
   status: GenericStatus;
@@ -41,17 +53,6 @@ export interface EmployeeOutputDTO {
   adress_id: string;
   created_at: Date;
   updated_at: Date;
-}
-
-// Address DTO
-
-export interface AddressInputDTO {
-  cep: string;
-  city: string;
-  state: string;
-  district: string;
-  street: string;
-  number?: string;
 }
 export interface AddressOutputDTO {
   id: string;

@@ -1,5 +1,9 @@
 import { FindAllArgs, FindAllReturn, IService } from "../../interfaces";
-import { EmployeeInputDTO, EmployeeOutputDTO } from "../../models/dtos";
+import {
+  EmployeeInputDTO,
+  EmployeeOutputDTO,
+  IUpdateEmployeeParams,
+} from "../../models/dtos";
 import { EmployeeRepository } from "../../models/repositories/user";
 
 export class EmployeeService implements IService {
@@ -9,8 +13,10 @@ export class EmployeeService implements IService {
 
     return result;
   }
-  async update(id: string, data: unknown): Promise<unknown> {
-    throw new Error("Method not implemented.");
+  async update(id: string, data: IUpdateEmployeeParams) {
+    const updatedEmployee = await this.employeeService.update(id, data);
+
+    return updatedEmployee;
   }
   async changeStatus(id: string, status: string): Promise<unknown> {
     throw new Error("Method not implemented.");

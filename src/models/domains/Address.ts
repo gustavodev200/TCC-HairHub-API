@@ -83,15 +83,27 @@ export class Address {
   validate() {
     const addressSchema = z
       .object({
-        id: z.string().uuid("id inválido"),
-        cep: z.string().min(8, ErrorMessages.MSGE08),
-        city: z.string().min(3, ErrorMessages.MSGE08),
-        state: z.string().max(2, ErrorMessages.MSGE09),
-        district: z.string().min(3, ErrorMessages.MSGE08),
-        street: z.string().min(3, ErrorMessages.MSGE08),
+        id: z
+          .string({ required_error: ErrorMessages.MSGE01 })
+          .uuid("id inválido"),
+        cep: z
+          .string({ required_error: ErrorMessages.MSGE01 })
+          .min(8, ErrorMessages.MSGE08),
+        city: z
+          .string({ required_error: ErrorMessages.MSGE01 })
+          .min(3, ErrorMessages.MSGE08),
+        state: z
+          .string({ required_error: ErrorMessages.MSGE01 })
+          .max(2, ErrorMessages.MSGE09),
+        district: z
+          .string({ required_error: ErrorMessages.MSGE01 })
+          .min(3, ErrorMessages.MSGE08),
+        street: z
+          .string({ required_error: ErrorMessages.MSGE01 })
+          .min(3, ErrorMessages.MSGE08),
         number: z.string().optional(),
       })
-      .partial({ id: true, status: true });
+      .partial({ id: true });
 
     try {
       addressSchema.parse(this);
