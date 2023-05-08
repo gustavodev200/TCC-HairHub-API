@@ -2,9 +2,11 @@ import { FindAllArgs, FindAllReturn, IService } from "../../interfaces";
 import {
   EmployeeInputDTO,
   EmployeeOutputDTO,
+  GenericStatus,
   IUpdateEmployeeParams,
 } from "../../models/dtos";
 import { EmployeeRepository } from "../../models/repositories/user";
+import { generateRandomPassword } from "../../utils";
 
 export class EmployeeService implements IService {
   private employeeService = new EmployeeRepository();
@@ -18,12 +20,22 @@ export class EmployeeService implements IService {
 
     return updatedEmployee;
   }
-  async changeStatus(id: string, status: string): Promise<unknown> {
-    throw new Error("Method not implemented.");
+  async changeStatus(id: string, status: GenericStatus) {
+    const updatedEmployee = await this.employeeService.update(id, {
+      status,
+    });
+
+    return updatedEmployee;
   }
   async list(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
     const result = await this.employeeService.findAll(args);
 
     return result;
+  }
+
+  async resetPassword(id: string) {
+    await this.employeeService.update(id, {
+      password: generateRandomPassword(Number(process.env.PASSWORD_LENGTH)),
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { AppError, ErrorMessages } from "../../errors";
+import { AddressDTO } from "../dtos";
 
 export class Address {
   constructor(
@@ -78,6 +79,16 @@ export class Address {
       street: this.street,
       number: this.number,
     };
+  }
+
+  setAll(data: AddressDTO) {
+    this.id = data.id;
+    this.cep = data.cep;
+    this.city = data.city;
+    this.state = data.state;
+    this.district = data.district;
+    this.street = data.street;
+    this.number = data.number as string;
   }
 
   validate() {

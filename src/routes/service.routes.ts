@@ -1,14 +1,14 @@
 import { Router } from "express";
 import multer from "multer";
 
-import { UploadImage } from "../../utils";
+import { UploadImage } from "../utils";
 
 import {
   ChangeServiceStatusController,
   CreateServiceController,
   ListServiceController,
   UpdateServiceController,
-} from "../../controllers/barbershop/servicesBarbershop";
+} from "../controllers/barbershop/servicesBarbershop";
 
 //controllers
 const createServiceController = new CreateServiceController();

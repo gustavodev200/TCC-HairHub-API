@@ -1,4 +1,5 @@
 import { prisma } from "../..";
+import bcrypt from "bcrypt";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgs, FindAllReturn, IRepository } from "../../../interfaces";
 import {
@@ -16,6 +17,8 @@ import {
   IUpdateEmployeeParams,
 } from "../../dtos";
 import { hash } from "bcrypt";
+import { newPasswordEmailTemplate } from "../../../utils/firstAccessPassword";
+import { firstAccessEmailTemplate } from "../../../utils/newPassword";
 
 export class EmployeeRepository implements IRepository {
   async create(data: EmployeeInputDTO) {
@@ -100,22 +103,28 @@ export class EmployeeRepository implements IRepository {
       await mail.sendMail(
         data.email,
         "Dados de Acesso a Plataforma Hair Hub BarberShop",
-        `
-        <h2>Bem-vindo(a) à Hair Hub BarberShop!</h2>
-        <p>Seu cadastro foi realizado com sucesso.</p>
-        <p>Segue abaixo os dados de acesso:</p>
-        <p><strong>Usuário:</strong> ${employee.email}</p>
-        <p><strong>Senha:</strong> ${passwordAccessEmail}</p>
-        <p>Para acessar o sistema, por favor acesse <a href="https://minhaempresa.com.br">https://minhaempresa.com.br</a>.</p>
-        <p>Obrigado!</p>
-      `
+        firstAccessEmailTemplate(
+          employee.name,
+          employee.email,
+          passwordAccessEmail
+        )
       );
 
-      return excludeFields(createdEmployee, [
-        "password",
-        "created_at",
-        "updated_at",
-      ]) as unknown as EmployeeOutputDTO;
+      const dataToReturn = {
+        ...excludeFields(createdEmployee, [
+          "created_at",
+          "updated_at",
+          "password",
+          "address_id",
+        ]),
+
+        address: excludeFields(createdEmployee.address, [
+          "created_at",
+          "updated_at",
+        ]),
+      };
+
+      return dataToReturn as unknown as EmployeeOutputDTO;
     } catch (error) {
       if (error instanceof AppError || error instanceof Error) throw error;
 
@@ -123,75 +132,130 @@ export class EmployeeRepository implements IRepository {
     }
   }
   async update(id: string, data: IUpdateEmployeeParams) {
-    // try {
-    //   const employeeToUpdate = await prisma.employee.findUnique({
-    //     where: { id },
-    //     include: {
-    //       address: true,
-    //     },
-    //   });
-    //   const address = new Address(
-    //     employeeToUpdate?.address?.cep!,
-    //     employeeToUpdate?.address?.city!,
-    //     employeeToUpdate?.address?.state!,
-    //     employeeToUpdate?.address?.district!,
-    //     employeeToUpdate?.address?.street!,
-    //     employeeToUpdate?.address?.number!
-    //   );
-    //   const employee = new Employee(
-    //     employeeToUpdate?.name!,
-    //     employeeToUpdate?.cpf!,
-    //     employeeToUpdate?.dataNasc?.toString(),
-    //     employeeToUpdate?.phone!,
-    //     employeeToUpdate?.role as AssignmentType,
-    //     address,
-    //     employeeToUpdate?.email!,
-    //     employeeToUpdate?.password!,
-    //     employeeToUpdate?.id,
-    //     employeeToUpdate?.status as GenericStatus,
-    //     employeeToUpdate?.image as string
-    //   );
-    //   if (data.name !== undefined) employee.name = data.name;
-    //   if (data.cpf !== undefined) employee.cpf = data.cpf;
-    //   employee.validate();
-    //   if (
-    //     employee.email !== employeeToUpdate?.email &&
-    //     employee.cpf !== employeeToUpdate?.cpf
-    //   ) {
-    //     const alreadyExists = await prisma.service.findUnique({
-    //       where: { name: data.cpf && data.email },
-    //     });
-    //     if (alreadyExists) {
-    //       throw new AppError(ErrorMessages.MSGE02);
-    //     }
-    //   }
-    //   const updatedEmployee = await prisma.employee.update({
-    //     where: { id },
-    //     data: {
-    //       name: employee.name,
-    //       cpf: employee.cpf,
-    //       email: employee.email,
-    //       phone: employee.phone,
-    //       role: employee.role,
-    //       status: employee.status,
-    //       image: employee.image,
-    //       address: {
-    //         update: {
-    //           cep: employee.address.cep,
-    //           city: employee.address.city,
-    //           state: employee.address.state,
-    //           district: employee.address.district,
-    //           street: employee.address.street,
-    //           number: employee.address.number,
-    //         },
-    //       },
-    //     },
-    //   });
-    //   return updatedEmployee as unknown as EmployeeOutputDTO;
-    // } catch (error) {
-    //   if (error instanceof AppError || error instanceof Error) throw error;
-    //   throw new AppError(ErrorMessages.MSGE05, 404);
-    // }
+    try {
+      const employeeToUpdate = await prisma.employee.findUnique({
+        where: { id },
+        include: {
+          address: true,
+        },
+      });
+
+      if (!employeeToUpdate) {
+        throw new AppError(ErrorMessages.MSGE05, 404);
+      }
+      const address = new Address(
+        employeeToUpdate?.address?.cep,
+        employeeToUpdate?.address?.city,
+        employeeToUpdate?.address?.state,
+        employeeToUpdate?.address?.district,
+        employeeToUpdate?.address?.street,
+        employeeToUpdate?.address?.number!,
+        employeeToUpdate?.address?.id
+      );
+
+      if (data.address) {
+        address.setAll(data.address);
+        address.validate();
+      }
+      const employee = new Employee(
+        employeeToUpdate?.name,
+        employeeToUpdate?.cpf,
+        employeeToUpdate?.dataNasc?.toString(),
+        employeeToUpdate?.phone,
+        employeeToUpdate?.role as AssignmentType,
+        address.toJSON(),
+        employeeToUpdate?.email,
+        employeeToUpdate?.password,
+        employeeToUpdate.id,
+        employeeToUpdate.status as GenericStatus
+      );
+
+      if (data.name !== undefined) employee.name = data.name;
+      if (data.cpf !== undefined) employee.cpf = data.cpf;
+      if (data.dataNasc !== undefined) employee.dataNasc = data.dataNasc;
+      if (data.phone !== undefined) employee.phone = data.phone;
+      if (data.role !== undefined) employee.role = data.role;
+      if (data.email !== undefined) employee.email = data.email;
+      if (data.password !== undefined) employee.password = data.password;
+      if (data.status !== undefined) employee.status = data.status;
+
+      employee.validate();
+
+      if (
+        employee.email !== employeeToUpdate?.email ||
+        employee.cpf !== employeeToUpdate?.cpf
+      ) {
+        const existingEmployee = await prisma.employee.findFirst({
+          where: { OR: [{ cpf: employee.cpf }, { email: employee.email }] },
+        });
+
+        if (existingEmployee) {
+          throw new AppError(ErrorMessages.MSGE02);
+        }
+      }
+
+      let hashPassword: string;
+
+      if (employee.password !== employeeToUpdate.password) {
+        hashPassword = await bcrypt.hash(
+          employee.password,
+          Number(process.env.BCRYPT_SALT)
+        );
+      }
+
+      const updatedEmployee = await prisma.employee.update({
+        where: { id },
+        data: {
+          name: employee.name,
+          cpf: employee.cpf,
+          email: employee.email,
+          phone: employee.phone,
+          role: employee.role,
+          status: employee.status,
+          image: employee.image,
+          address: {
+            update: {
+              ...address.toJSON(),
+            },
+          },
+        },
+        include: {
+          address: true,
+        },
+      });
+
+      if (data.password) {
+        const mail = new Mail();
+
+        await mail.sendMail(
+          employee.email,
+          "Novaos dados de acesso a plataforma Hair Hub BarberShop",
+          newPasswordEmailTemplate(
+            employee.name,
+            employee.email,
+            employee.password
+          )
+        );
+      }
+
+      const dataToReturn = {
+        ...excludeFields(updatedEmployee, [
+          "created_at",
+          "updated_at",
+          "password",
+          "address_id",
+        ]),
+        address: excludeFields(updatedEmployee.address, [
+          "created_at",
+          "updated_at",
+        ]),
+      };
+
+      return dataToReturn;
+    } catch (error) {
+      if (error instanceof AppError || error instanceof Error) throw error;
+      throw new AppError(ErrorMessages.MSGE05, 404);
+    }
   }
   async findAll(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
     const where = {
@@ -199,6 +263,16 @@ export class EmployeeRepository implements IRepository {
         ? [
             {
               name: {
+                contains: args?.searchTerm,
+              },
+            },
+            {
+              cpf: {
+                contains: args?.searchTerm,
+              },
+            },
+            {
+              email: {
                 contains: args?.searchTerm,
               },
             },
@@ -218,15 +292,40 @@ export class EmployeeRepository implements IRepository {
       },
       skip: args?.skip,
       take: args?.take,
-
       orderBy: {
         status: "asc",
       },
     });
 
+    const dataToUse = data.map((employee) => ({
+      ...excludeFields(employee, [
+        "created_at",
+        "updated_at",
+        "password",
+        "address_id",
+      ]),
+
+      address: excludeFields(employee.address, ["created_at", "updated_at"]),
+    }));
+
     return {
-      data: parseArrayOfData(data, ["password"]),
+      data: dataToUse,
       totalItems,
     };
+  }
+
+  async findByEmail(email: string) {
+    try {
+      const employee = await prisma.employee.findUniqueOrThrow({
+        where: { email },
+        include: {
+          address: true,
+        },
+      });
+
+      return { ...employee };
+    } catch {
+      throw new AppError(ErrorMessages.MSGE02);
+    }
   }
 }
