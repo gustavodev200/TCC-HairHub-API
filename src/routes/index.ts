@@ -6,8 +6,8 @@ import AuthenticationHandler from "../middlewares/AuthenticationHandler";
 
 const routes = Router();
 
-routes.use("/services", AuthenticationHandler.handle, serviceRoutes);
-routes.use("/employees", AuthenticationHandler.handle, employeeRoutes);
+routes.use("/services", serviceRoutes);
+routes.use("/employees", employeeRoutes);
 routes.use("/auth", authRoutes);
 
 export { routes };

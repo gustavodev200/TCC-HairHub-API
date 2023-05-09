@@ -24,7 +24,7 @@ CREATE TABLE `employees` (
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
     `status` ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
-    `role` ENUM('admin', 'employee', 'client') NOT NULL DEFAULT 'employee',
+    `role` ENUM('admin', 'employee', 'client', 'attendant') NOT NULL DEFAULT 'employee',
     `address_id` VARCHAR(191) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,

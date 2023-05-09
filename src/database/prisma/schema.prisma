@@ -11,6 +11,7 @@ enum AssignmentType {
     admin
     employee
     client
+    attendant
 }
 
 enum Status {
