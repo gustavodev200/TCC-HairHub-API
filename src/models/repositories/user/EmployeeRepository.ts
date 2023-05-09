@@ -144,23 +144,24 @@ export class EmployeeRepository implements IRepository {
         throw new AppError(ErrorMessages.MSGE05, 404);
       }
       const address = new Address(
-        employeeToUpdate?.address?.cep,
-        employeeToUpdate?.address?.city,
-        employeeToUpdate?.address?.state,
-        employeeToUpdate?.address?.district,
-        employeeToUpdate?.address?.street,
-        employeeToUpdate?.address?.number!,
-        employeeToUpdate?.address?.id
+        employeeToUpdate.address.cep,
+        employeeToUpdate.address.city,
+        employeeToUpdate.address.state,
+        employeeToUpdate.address.district,
+        employeeToUpdate.address.street,
+        employeeToUpdate.address.number!,
+        employeeToUpdate.address.id
       );
 
       if (data.address) {
         address.setAll(data.address);
         address.validate();
       }
+
       const employee = new Employee(
         employeeToUpdate?.name,
         employeeToUpdate?.cpf,
-        employeeToUpdate?.dataNasc?.toString(),
+        employeeToUpdate?.dataNasc?.toISOString(),
         employeeToUpdate?.phone,
         employeeToUpdate?.role as AssignmentType,
         address.toJSON(),
@@ -194,7 +195,7 @@ export class EmployeeRepository implements IRepository {
         }
       }
 
-      let hashPassword: string;
+      let hashPassword: string = employeeToUpdate.password;
 
       if (employee.password !== employeeToUpdate.password) {
         hashPassword = await bcrypt.hash(
@@ -213,6 +214,7 @@ export class EmployeeRepository implements IRepository {
           role: employee.role,
           status: employee.status,
           image: employee.image,
+          password: hashPassword,
           address: {
             update: {
               ...address.toJSON(),

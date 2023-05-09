@@ -16,6 +16,7 @@ export interface UserInterface {
 }
 
 export interface IUpdateEmployeeParams {
+  id?: string;
   name?: string;
   cpf?: string;
   dataNasc?: string;
