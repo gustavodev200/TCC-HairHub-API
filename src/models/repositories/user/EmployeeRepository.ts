@@ -159,14 +159,14 @@ export class EmployeeRepository implements IRepository {
       }
 
       const employee = new Employee(
-        employeeToUpdate?.name,
-        employeeToUpdate?.cpf,
-        employeeToUpdate?.dataNasc?.toISOString(),
-        employeeToUpdate?.phone,
-        employeeToUpdate?.role as AssignmentType,
+        employeeToUpdate.name,
+        employeeToUpdate.cpf,
+        employeeToUpdate.dataNasc.toISOString(),
+        employeeToUpdate.phone,
+        employeeToUpdate.role as AssignmentType,
         address.toJSON(),
-        employeeToUpdate?.email,
-        employeeToUpdate?.password,
+        employeeToUpdate.email,
+        employeeToUpdate.password,
         employeeToUpdate.id,
         employeeToUpdate.status as GenericStatus
       );
@@ -183,8 +183,8 @@ export class EmployeeRepository implements IRepository {
       employee.validate();
 
       if (
-        employee.email !== employeeToUpdate?.email ||
-        employee.cpf !== employeeToUpdate?.cpf
+        employee.email !== employeeToUpdate.email ||
+        employee.cpf !== employeeToUpdate.cpf
       ) {
         const existingEmployee = await prisma.employee.findFirst({
           where: { OR: [{ cpf: employee.cpf }, { email: employee.email }] },
