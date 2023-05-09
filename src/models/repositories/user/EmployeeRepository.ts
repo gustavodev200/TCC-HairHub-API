@@ -231,7 +231,7 @@ export class EmployeeRepository implements IRepository {
 
         await mail.sendMail(
           employee.email,
-          "Novaos dados de acesso a plataforma Hair Hub BarberShop",
+          "Novos dados de acesso a plataforma Hair Hub BarberShop",
           newPasswordEmailTemplate(
             employee.name,
             employee.email,
