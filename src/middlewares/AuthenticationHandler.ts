@@ -4,18 +4,12 @@ import { AppError, ErrorMessages } from "../errors";
 import { AssignmentType, GenericStatus } from "../models/dtos";
 import { EmployeeRepository } from "../models/repositories/user";
 
-interface CustomRequest extends Request {
-  user?: {
-    id: string;
-    role: AssignmentType;
-  };
-}
 interface Payload {
   sub: string;
 }
 
 export async function authenticationHandler(
-  req: CustomRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) {
