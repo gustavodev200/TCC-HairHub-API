@@ -6,7 +6,7 @@ import ListEmployeeController from "../controllers/users/employee/ListEmployeeCo
 import UpdateEmployeeController from "../controllers/users/employee/UpdateEmployeeController";
 import ResetEmployeePasswordController from "../controllers/users/employee/ResetEmployeePasswordController";
 import ChangeEmployeeStatusController from "../controllers/users/employee/ChangeEmployeeStatusController";
-import AuthenticationHandler from "../middlewares/AuthenticationHandler";
+import { authenticationHandler } from "../middlewares/authenticationHandler";
 
 const employeeRoutes = Router();
 
@@ -15,25 +15,21 @@ employeeRoutes.post("/register", CreateEmployeeController.handle);
 //update employee
 employeeRoutes.put(
   "/:id",
-  AuthenticationHandler.handle,
+  authenticationHandler,
   UpdateEmployeeController.handle
 );
 //list employee
-employeeRoutes.get(
-  "/",
-  AuthenticationHandler.handle,
-  ListEmployeeController.handle
-);
+employeeRoutes.get("/", ListEmployeeController.handle);
 //resete-password employee
 employeeRoutes.put(
   "/:id/reset-password",
-  AuthenticationHandler.handle,
+  authenticationHandler,
   ResetEmployeePasswordController.handle
 );
 //change status employee
 employeeRoutes.patch(
   "/:id",
-  AuthenticationHandler.handle,
+  authenticationHandler,
   ChangeEmployeeStatusController.handle
 );
 

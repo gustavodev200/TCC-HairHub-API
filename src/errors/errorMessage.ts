@@ -15,4 +15,6 @@ export enum ErrorMessages {
   MSGE14 = "Erro - CPF inválido!",
   MSGE15 = "E-mail ou senha incorretos!",
   MSGE16 = "Não foi possível renovar sua sessão. Faça login novamente!",
+  MSGE17 = "Credenciais inválidas",
+  MSGE18 = "Acesso não autorizado",
 }

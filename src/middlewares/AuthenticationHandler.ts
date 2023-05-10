@@ -1,42 +1,55 @@
 import { verify } from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
-
-export interface PayloadInterface {
-  id: string;
-}
+import { AppError, ErrorMessages } from "../errors";
+import { AssignmentType, GenericStatus } from "../models/dtos";
+import { EmployeeRepository } from "../models/repositories/user";
 
 interface CustomRequest extends Request {
-  userId?: string;
+  user?: {
+    id: string;
+    role: AssignmentType;
+  };
+}
+interface Payload {
+  sub: string;
 }
 
-export class AuthenticationHandler {
-  async handle(req: CustomRequest, res: Response, next: NextFunction) {
-    const authToken = req.headers.authorization;
+export async function authenticationHandler(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) {
+  const authHeader = req.headers.authorization;
 
-    if (!authToken) {
-      res.status(401).json({
-        error: "Acesso não autorizado!",
-      });
+  if (!authHeader) {
+    throw new AppError(ErrorMessages.MSGE18, 401);
+  }
+
+  const [, token] = authHeader.split(" ");
+
+  try {
+    const { sub: id } = verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as Payload;
+
+    const employeeRepository = new EmployeeRepository();
+
+    const employee = await employeeRepository.findById(id);
+
+    if (employee.status === GenericStatus.inactive) {
+      throw new AppError(ErrorMessages.MSGE18, 401);
     }
 
-    const [, token] = authToken!.split(" ");
+    req.user = {
+      id,
+      role: employee.role as AssignmentType,
+    };
 
-    try {
-      const { id } = verify(
-        token,
-        `${process.env.JWT_SECRET}`
-      ) as PayloadInterface;
-      const userId = id;
+    next();
+  } catch (e) {
+    if (e instanceof Error || e instanceof AppError) throw e;
 
-      req.userId = userId;
-
-      return next();
-    } catch (error) {
-      return res.status(401).json({
-        error: "Acesso não autorizado!",
-      });
-    }
+    throw new AppError(ErrorMessages.MSGE14, 401);
   }
 }
-
-export default new AuthenticationHandler();

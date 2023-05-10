@@ -9,7 +9,7 @@ export class ResetEmployeePasswordController {
 
     await employeeService.resetPassword(id);
 
-    return res.status(202).send();
+    return res.status(202).json({ message: "Senha alterada com sucesso!" });
   }
 }
 

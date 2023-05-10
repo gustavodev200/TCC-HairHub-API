@@ -330,4 +330,16 @@ export class EmployeeRepository implements IRepository {
       throw new AppError(ErrorMessages.MSGE02);
     }
   }
+
+  async findById(id: string) {
+    try {
+      const employee = await prisma.employee.findUniqueOrThrow({
+        where: { id },
+      });
+
+      return { ...employee, role: employee.role };
+    } catch {
+      throw new AppError(ErrorMessages.MSGE02);
+    }
+  }
 }
