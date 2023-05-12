@@ -53,7 +53,7 @@ export class Employee extends User {
           .string({ required_error: ErrorMessages.MSGE01 })
           .min(11, ErrorMessages.MSGE08)
           .max(11, ErrorMessages.MSGE09)
-          .refine((cpf) => validateCPF(cpf), ErrorMessages.MSGE12),
+          .refine((cpf) => validateCPF(cpf), ErrorMessages.MSGE14),
         dataNasc: z.string({ required_error: ErrorMessages.MSGE01 }),
         phone: z
           .string({ required_error: ErrorMessages.MSGE01 })

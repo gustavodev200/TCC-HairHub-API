@@ -339,7 +339,7 @@ export class EmployeeRepository implements IRepository {
 
       return { ...employee, role: employee.role };
     } catch {
-      throw new AppError(ErrorMessages.MSGE02);
+      throw new AppError(ErrorMessages.MSGE02, 404);
     }
   }
 }

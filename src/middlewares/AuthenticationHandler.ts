@@ -42,8 +42,9 @@ export async function authenticationHandler(
 
     next();
   } catch (e) {
-    if (e instanceof Error || e instanceof AppError) throw e;
+    if (e instanceof Error || (e instanceof AppError && e.statusCode !== 404))
+      throw e;
 
-    throw new AppError(ErrorMessages.MSGE14, 401);
+    throw new AppError(ErrorMessages.MSGE18, 401);
   }
 }

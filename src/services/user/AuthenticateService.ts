@@ -27,7 +27,7 @@ export class AuthenticateService {
     }
 
     const token = sign({ id: employee.id }, `${process.env.JWT_SECRET}`, {
-      subject: employee.email,
+      subject: employee.id,
       expiresIn: "7d",
     });
 
