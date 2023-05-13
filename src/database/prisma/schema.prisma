@@ -65,3 +65,8 @@ model Address {
 
     @@map("address")
 }
+
+model Categories {
+    id   String @id @default(uuid())
+    name String
+}

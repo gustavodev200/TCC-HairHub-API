@@ -1,13 +1,13 @@
-import { prisma } from "../../..";
-import { AppError, ErrorMessages } from "../../../../errors";
-import { FindAllArgs, IRepository } from "../../../../interfaces/IRepository";
-import { Service } from "../../../domains";
+import { prisma } from "../..";
+import { AppError, ErrorMessages } from "../../../errors";
+import { FindAllArgs, IRepository } from "../../../interfaces/IRepository";
+import { Service } from "../../domains";
 import {
   GenericStatus,
   IServiceInputDTO,
   IServiceOutputDTO,
   IUpdateServiceParams,
-} from "../../../dtos";
+} from "../../dtos";
 
 export class ServiceRepository implements IRepository {
   public async create({

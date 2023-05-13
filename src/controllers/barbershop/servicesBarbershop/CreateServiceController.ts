@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ServiceBarbershop } from "../../../services/servicesBarbershop/ServiceBarbershop";
+import { ServiceBarbershop } from "../../../services/ServiceBarbershop";
 import { Cloudinary } from "../../../utils";
 import { IServiceInputDTO } from "../../../models/dtos";
 import { AppError } from "../../../errors/AppError";

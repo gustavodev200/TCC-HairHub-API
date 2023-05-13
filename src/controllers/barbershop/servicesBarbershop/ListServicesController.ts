@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ServiceBarbershop } from "../../../services/servicesBarbershop/ServiceBarbershop";
+import { ServiceBarbershop } from "../../../services/ServiceBarbershop";
 import { IServiceOutputDTO } from "../../../models/dtos";
 import { PaginatedResponse } from "../../../utils";
 

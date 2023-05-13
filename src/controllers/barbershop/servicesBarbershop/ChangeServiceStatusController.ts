@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ServiceBarbershop } from "../../../services/servicesBarbershop/ServiceBarbershop";
+import { ServiceBarbershop } from "../../../services/ServiceBarbershop";
 import { AppError } from "../../../errors/AppError";
 import { ErrorMessages } from "../../../errors";
 

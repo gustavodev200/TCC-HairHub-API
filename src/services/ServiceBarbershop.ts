@@ -1,11 +1,11 @@
-import { IService } from "../../interfaces";
-import { FindAllArgs, FindAllReturn } from "../../interfaces/IRepository";
-import { GenericStatus } from "../../models/dtos";
+import { IService } from "../interfaces";
+import { FindAllArgs, FindAllReturn } from "../interfaces/IRepository";
+import { GenericStatus } from "../models/dtos";
 import {
   IServiceInputDTO,
   IUpdateServiceParams,
-} from "../../models/dtos/ServiceDTO";
-import { ServiceRepository } from "../../models/repositories/barbershop/servicesBarbershop";
+} from "../models/dtos/ServiceDTO";
+import { ServiceRepository } from "../models/repositories/barbershop";
 
 export class ServiceBarbershop implements IService {
   private serviceRepository = new ServiceRepository();

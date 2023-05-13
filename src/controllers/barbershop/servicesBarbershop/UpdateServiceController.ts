@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { IServiceOutputDTO } from "../../../models/dtos";
-import { ServiceBarbershop } from "../../../services/servicesBarbershop/ServiceBarbershop";
+import { ServiceBarbershop } from "../../../services/ServiceBarbershop";
 import { UpdateNewImage } from "../../../utils";
 import { prisma } from "../../../models";
 import { AppError, ErrorMessages } from "../../../errors";
