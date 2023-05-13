@@ -2,6 +2,7 @@ import { FindAllArgs, FindAllReturn, IService } from "../interfaces";
 import {
   CategoryDTO,
   CategoryOutputDTO,
+  GenericStatus,
   UpdateParamsCategoryDTO,
 } from "../models/dtos";
 import { CategoryRepository } from "../models/repositories/barbershop";
@@ -21,8 +22,12 @@ export class CategoryService implements IService {
 
     return updateCategory;
   }
-  async changeStatus(id: string, status: string): Promise<unknown> {
-    throw new Error("Method not implemented.");
+  async changeStatus(id: string, status: GenericStatus) {
+    const changeCategoryStatus = await this.categoryRepository.update(id, {
+      status,
+    });
+
+    return changeCategoryStatus;
   }
   async list(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
     const result = await this.categoryRepository.findAll(args);

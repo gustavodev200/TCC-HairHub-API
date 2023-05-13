@@ -11,7 +11,7 @@ import {
 
 export class CategoryRepository implements IRepository {
   async create({ name }: CategoryDTO): Promise<CategoryOutputDTO> {
-    const existingCategory = await prisma.service.findUnique({
+    const existingCategory = await prisma.categories.findUnique({
       where: { name },
     });
 
