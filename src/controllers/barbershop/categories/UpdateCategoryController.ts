@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
-import { CategoryDTO } from "../../../models/dtos";
 import { CategoryService } from "../../../services";
 
 class UpdateCategoryController {
   public async handle(req: Request, res: Response) {
     const { id } = req.params;
-    let data = req.body as CategoryDTO;
+    let data = req.body;
 
     const updateCategoryService = new CategoryService();
 

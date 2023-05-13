@@ -67,6 +67,7 @@ model Address {
 }
 
 model Categories {
-    id   String @id @default(uuid())
-    name String
+    id     String @id @default(uuid())
+    name   String
+    status Status @default(active)
 }
