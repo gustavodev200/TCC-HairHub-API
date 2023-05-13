@@ -9,7 +9,7 @@ import ChangeEmployeeStatusController from "../controllers/users/employee/Change
 const employeeRoutes = Router();
 
 //create employee
-employeeRoutes.post("/register", CreateEmployeeController.handle);
+employeeRoutes.post("/", CreateEmployeeController.handle);
 //update employee
 employeeRoutes.put("/:id", UpdateEmployeeController.handle);
 //list employee
