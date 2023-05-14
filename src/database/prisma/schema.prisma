@@ -70,4 +70,19 @@ model Categories {
     id     String @id @default(uuid())
     name   String @unique
     status Status @default(active)
+
+    @@map("categories")
+}
+
+model Product {
+    id          String   @id @default(uuid())
+    name        String   @unique
+    price       Float
+    description String   @db.VarChar(500)
+    amount      Int
+    status      Status   @default(active)
+    created_at  DateTime @default(now())
+    updated_at  DateTime @updatedAt
+
+    @@map("products")
 }

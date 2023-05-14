@@ -41,7 +41,7 @@ export class Category {
   }
 
   validate() {
-    const serviceSchema = z
+    const categorySchema = z
       .object({
         id: z.string().uuid("id inválido"),
         status: z.enum([GenericStatus.active, GenericStatus.inactive], {
@@ -55,7 +55,7 @@ export class Category {
       .partial({ id: true, status: true });
 
     try {
-      serviceSchema.parse(this);
+      categorySchema.parse(this);
     } catch (err) {
       throw new AppError(`Erro tente novamente mais tarde! - ${err}`);
     }
