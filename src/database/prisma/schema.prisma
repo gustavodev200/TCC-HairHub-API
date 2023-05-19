@@ -51,6 +51,24 @@ model Employee {
     @@map("employees")
 }
 
+model Client {
+    id         String         @id @default(uuid())
+    name       String
+    cpf        String         @unique
+    dataNasc   DateTime
+    phone      String
+    email      String         @unique
+    password   String
+    status     Status         @default(active)
+    role       AssignmentType @default(client)
+    address    Address        @relation(fields: [address_id], references: [id])
+    address_id String         @unique
+    created_at DateTime       @default(now())
+    updated_at DateTime       @updatedAt
+
+    @@map("clients")
+}
+
 model Address {
     id         String    @id @default(uuid())
     cep        String
@@ -60,6 +78,7 @@ model Address {
     street     String
     number     String?
     employee   Employee?
+    client     Client?
     created_at DateTime  @default(now())
     updated_at DateTime  @updatedAt
 

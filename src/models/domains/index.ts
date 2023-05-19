@@ -6,3 +6,4 @@ export * from "./Mail";
 export * from "./Employee";
 export * from "./Product";
 export * from "./Category";
+export * from "./Client";
