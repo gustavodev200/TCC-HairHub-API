@@ -85,23 +85,26 @@ model Address {
     @@map("address")
 }
 
-model Categories {
-    id     String @id @default(uuid())
-    name   String @unique
-    status Status @default(active)
+model Category {
+    id       String    @id @default(uuid())
+    name     String    @unique
+    products Product[]
+    status   Status    @default(active)
 
     @@map("categories")
 }
 
 model Product {
-    id          String   @id @default(uuid())
-    name        String   @unique
+    id          String    @id @default(uuid())
+    name        String    @unique
     price       Float
-    description String   @db.VarChar(500)
+    description String    @db.VarChar(500)
     amount      Int
-    status      Status   @default(active)
-    created_at  DateTime @default(now())
-    updated_at  DateTime @updatedAt
+    status      Status    @default(active)
+    created_at  DateTime  @default(now())
+    updated_at  DateTime  @updatedAt
+    Category    Category? @relation(fields: [category_id], references: [id])
+    category_id String?
 
     @@map("products")
 }

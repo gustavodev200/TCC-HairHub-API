@@ -11,7 +11,7 @@ import {
 
 export class CategoryRepository implements IRepository {
   async create({ name }: CategoryDTO): Promise<CategoryOutputDTO> {
-    const existingCategory = await prisma.categories.findUnique({
+    const existingCategory = await prisma.category.findUnique({
       where: { name },
     });
 
@@ -23,7 +23,7 @@ export class CategoryRepository implements IRepository {
 
     category.validate();
 
-    const createCategory = await prisma.categories.create({
+    const createCategory = await prisma.category.create({
       data: {
         name: category.name,
       },
@@ -35,7 +35,7 @@ export class CategoryRepository implements IRepository {
     id: string,
     data: UpdateParamsCategoryDTO
   ): Promise<CategoryOutputDTO> {
-    const categoryToUpdate = await prisma.categories.findUniqueOrThrow({
+    const categoryToUpdate = await prisma.category.findUniqueOrThrow({
       where: { id },
     });
 
@@ -54,7 +54,7 @@ export class CategoryRepository implements IRepository {
 
     category.validate();
 
-    const updateCategory = await prisma.categories.update({
+    const updateCategory = await prisma.category.update({
       where: { id },
       data: {
         name: category.name,
@@ -80,9 +80,9 @@ export class CategoryRepository implements IRepository {
       },
     };
 
-    const totalItems = await prisma.categories.count({ where });
+    const totalItems = await prisma.category.count({ where });
 
-    const data = await prisma.categories.findMany({
+    const data = await prisma.category.findMany({
       where,
       skip: args?.skip,
       take: args?.take,

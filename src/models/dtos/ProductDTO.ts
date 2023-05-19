@@ -7,6 +7,7 @@ export interface UpdateParamsProductDTO {
   description?: string;
   amount?: number;
   status?: GenericStatus;
+  category_id?: string;
 }
 
 export interface ProductInputDTO {
@@ -14,6 +15,7 @@ export interface ProductInputDTO {
   price: number;
   description: string;
   amount: number;
+  category_id: string;
 }
 
 export interface ProductOutputDTO extends ProductInputDTO {

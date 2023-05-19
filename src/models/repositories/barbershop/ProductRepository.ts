@@ -15,6 +15,7 @@ export class ProductRepository implements IRepository {
     price,
     description,
     amount,
+    category_id,
   }: ProductInputDTO): Promise<ProductOutputDTO> {
     const existingProduct = await prisma.product.findUnique({
       where: { name },
@@ -24,7 +25,7 @@ export class ProductRepository implements IRepository {
       throw new AppError(ErrorMessages.MSGE02);
     }
 
-    const product = new Product(name, price, description, amount);
+    const product = new Product(name, price, description, amount, category_id);
 
     product.validate();
 
@@ -35,6 +36,11 @@ export class ProductRepository implements IRepository {
         description: product.description,
         amount: Number(product.amount),
         status: product.status,
+        Category: {
+          connect: {
+            id: product.category_id,
+          },
+        },
       },
     });
 
@@ -78,6 +84,14 @@ export class ProductRepository implements IRepository {
         amount: Number(product.amount),
         id: product.id,
         status: product.status,
+        Category:
+          product.category_id !== productToUpdate.category_id
+            ? {
+                connect: {
+                  id: product.category_id,
+                },
+              }
+            : undefined,
       },
     });
 

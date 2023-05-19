@@ -8,6 +8,7 @@ export class Product {
     private _price: number,
     private _description: string,
     private _amount: number,
+    private _category_id: string,
     private _id?: string,
     private _status?: GenericStatus
   ) {}
@@ -36,6 +37,10 @@ export class Product {
     return this._status!;
   }
 
+  get category_id() {
+    return this._category_id;
+  }
+
   set name(name: string) {
     this._name = name;
   }
@@ -60,6 +65,10 @@ export class Product {
     this._status = status;
   }
 
+  set category_id(category_id: string) {
+    this._category_id = category_id;
+  }
+
   toJSON() {
     return {
       id: this.id,
@@ -68,6 +77,7 @@ export class Product {
       description: this.description,
       amount: this.amount,
       status: this.status,
+      category_id: this.category_id,
     };
   }
 
