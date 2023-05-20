@@ -1,3 +1,4 @@
+import { AddressDTO } from "./AddressDTO";
 import { GenericStatus } from "./Status";
 import { AddressOutputDTO, AssignmentType } from "./UserDTO";
 
@@ -22,4 +23,17 @@ export interface ClientOutputDTO {
   adress_id: string;
   created_at: Date;
   updated_at: Date;
+}
+
+export interface IUpdateClientParams {
+  id?: string;
+  name?: string;
+  cpf?: string;
+  dataNasc?: string;
+  phone?: string;
+  email?: string;
+  role?: AssignmentType;
+  address?: AddressDTO;
+  password?: string;
+  status?: GenericStatus;
 }
