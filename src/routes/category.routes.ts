@@ -3,6 +3,7 @@ import ListCategoryController from "../controllers/barbershop/categories/ListCat
 import UpdateCategoryController from "../controllers/barbershop/categories/UpdateCategoryController";
 import ChangeCategoryStatusController from "../controllers/barbershop/categories/ChangeCategoryStatusController";
 import CreateCategoryController from "../controllers/barbershop/categories/CreateCategoryController";
+import ListProductsByCategoriesController from "../controllers/barbershop/categories/ListProductsByCategoriesController";
 
 const categoryRoutes = Router();
 
@@ -14,5 +15,7 @@ categoryRoutes.patch("/:id", ChangeCategoryStatusController.handle);
 categoryRoutes.put("/:id", UpdateCategoryController.handle);
 //list category
 categoryRoutes.get("/", ListCategoryController.handle);
+
+categoryRoutes.get("/products", ListProductsByCategoriesController.handle);
 
 export { categoryRoutes };

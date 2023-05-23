@@ -1,6 +1,7 @@
 import { prisma } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgs, FindAllReturn, IRepository } from "../../../interfaces";
+import { excludeFields } from "../../../utils";
 import { Category } from "../../domains/Category";
 import {
   CategoryDTO,
@@ -96,5 +97,20 @@ export class CategoryRepository implements IRepository {
       data,
       totalItems,
     };
+  }
+
+  async listCategoriesWithProducts() {
+    const categoriesWithProducts = await prisma.category.findMany({
+      where: {
+        products: {
+          some: {},
+        },
+      },
+      include: {
+        products: true,
+      },
+    });
+
+    return categoriesWithProducts;
   }
 }
