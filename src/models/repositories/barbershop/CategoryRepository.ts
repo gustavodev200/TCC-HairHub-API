@@ -99,9 +99,42 @@ export class CategoryRepository implements IRepository {
     };
   }
 
-  async listCategoriesWithProducts() {
+  async listCategoriesWithProducts(args?: FindAllArgs | undefined) {
     const categoriesWithProducts = await prisma.category.findMany({
       where: {
+        OR: args?.searchTerm
+          ? [
+              {
+                name: {
+                  contains: args?.searchTerm,
+                },
+              },
+
+              {
+                products: {
+                  some: {
+                    OR: [
+                      {
+                        name: {
+                          contains: args?.searchTerm,
+                        },
+                      },
+
+                      {
+                        description: {
+                          contains: args?.searchTerm,
+                        },
+                      },
+                    ],
+                  },
+                },
+              },
+            ]
+          : undefined,
+        status: {
+          equals: args?.filterByStatus,
+        },
+
         products: {
           some: {},
         },

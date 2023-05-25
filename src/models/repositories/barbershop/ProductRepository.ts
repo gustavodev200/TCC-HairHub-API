@@ -63,6 +63,7 @@ export class ProductRepository implements IRepository {
       productToUpdate.price,
       productToUpdate.description,
       productToUpdate.amount,
+      productToUpdate.category_id!,
       productToUpdate.id,
       productToUpdate.status as GenericStatus
     );
@@ -96,38 +97,5 @@ export class ProductRepository implements IRepository {
     });
 
     return updateProduct as ProductOutputDTO;
-  }
-  async findAll(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
-    const where = {
-      OR: args?.searchTerm
-        ? [
-            {
-              name: {
-                contains: args?.searchTerm,
-              },
-            },
-          ]
-        : undefined,
-      status: {
-        equals: args?.filterByStatus,
-      },
-    };
-
-    const totalItems = await prisma.product.count({ where });
-
-    const data = await prisma.product.findMany({
-      where,
-      skip: args?.skip,
-      take: args?.take,
-
-      orderBy: {
-        status: "asc",
-      },
-    });
-
-    return {
-      data,
-      totalItems,
-    };
   }
 }
