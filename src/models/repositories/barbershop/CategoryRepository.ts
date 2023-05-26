@@ -102,45 +102,52 @@ export class CategoryRepository implements IRepository {
   async listCategoriesWithProducts(args?: FindAllArgs | undefined) {
     const categoriesWithProducts = await prisma.category.findMany({
       where: {
-        OR: args?.searchTerm
-          ? [
-              {
-                name: {
-                  contains: args?.searchTerm,
-                },
-              },
-
-              {
-                products: {
-                  some: {
-                    OR: [
-                      {
-                        name: {
-                          contains: args?.searchTerm,
-                        },
-                      },
-
-                      {
-                        description: {
-                          contains: args?.searchTerm,
-                        },
-                      },
-                    ],
-                  },
-                },
-              },
-            ]
-          : undefined,
-        status: {
-          equals: args?.filterByStatus,
-        },
-
         products: {
-          some: {},
+          some: {
+            status: {
+              equals: args?.filterByStatus,
+            },
+            OR: args?.searchTerm
+              ? [
+                  {
+                    name: {
+                      contains: args?.searchTerm,
+                    },
+                  },
+
+                  {
+                    description: {
+                      contains: args?.searchTerm,
+                    },
+                  },
+                ]
+              : undefined,
+          },
         },
       },
       include: {
-        products: true,
+        products: {
+          where: {
+            status: {
+              equals: args?.filterByStatus,
+            },
+            OR: args?.searchTerm
+              ? [
+                  {
+                    name: {
+                      contains: args?.searchTerm,
+                    },
+                  },
+
+                  {
+                    description: {
+                      contains: args?.searchTerm,
+                    },
+                  },
+                ]
+              : undefined,
+          },
+        },
       },
     });
 

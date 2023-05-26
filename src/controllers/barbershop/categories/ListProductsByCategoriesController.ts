@@ -5,7 +5,7 @@ import { AppError } from "../../../errors";
 
 export class ListProductsByCategoriesController {
   public async handle(req: Request, res: Response) {
-    const data = req.query;
+    const { query, filterByStatus } = req.query;
     const productsByCategoriesServices = new CategoryService();
 
     if (
@@ -16,7 +16,10 @@ export class ListProductsByCategoriesController {
     }
 
     const result =
-      await productsByCategoriesServices.listCategoriesWithProducts(data);
+      await productsByCategoriesServices.listCategoriesWithProducts({
+        searchTerm: query as string,
+        filterByStatus: filterByStatus as GenericStatus,
+      });
 
     return res.json(result);
   }
