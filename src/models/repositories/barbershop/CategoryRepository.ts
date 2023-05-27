@@ -38,10 +38,18 @@ export class CategoryRepository implements IRepository {
   ): Promise<CategoryOutputDTO> {
     const categoryToUpdate = await prisma.category.findUniqueOrThrow({
       where: { id },
+      include: { products: true },
     });
 
     if (!categoryToUpdate) {
       throw new AppError(ErrorMessages.MSGE05, 404);
+    }
+
+    if (
+      categoryToUpdate.products.length > 0 &&
+      data.status === GenericStatus.inactive
+    ) {
+      throw new AppError(ErrorMessages.MSGE04);
     }
 
     const category = new Category(
@@ -157,15 +165,18 @@ export class CategoryRepository implements IRepository {
 
   async listCategories(args?: FindAllArgs | undefined): Promise<CategoryDTO[]> {
     const where = {
-      OR: args?.searchTerm
-        ? [
-            {
+      AND: [
+        args?.searchTerm
+          ? {
               name: {
-                contains: args?.searchTerm,
+                contains: args.searchTerm,
               },
-            },
-          ]
-        : undefined,
+            }
+          : {},
+        {
+          status: GenericStatus.active,
+        },
+      ],
     };
 
     const data = await prisma.category.findMany({

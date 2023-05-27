@@ -17,6 +17,12 @@ export class ProductRepository implements IRepository {
     amount,
     category_id,
   }: ProductInputDTO): Promise<ProductOutputDTO> {
+    const existingCategories = await prisma.category.findMany();
+
+    if (existingCategories.length === 0) {
+      throw new AppError(ErrorMessages.MSGE019);
+    }
+
     const existingProduct = await prisma.product.findUnique({
       where: { name },
     });

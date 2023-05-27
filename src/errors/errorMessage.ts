@@ -17,4 +17,5 @@ export enum ErrorMessages {
   MSGE16 = "Não foi possível renovar sua sessão. Faça login novamente!",
   MSGE17 = "Credenciais inválidas",
   MSGE18 = "Acesso não autorizado",
+  MSGE019 = "Não é possível criar um produto sem nenhuma categoria criada.",
 }
