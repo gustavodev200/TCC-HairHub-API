@@ -52,6 +52,7 @@ export class CategoryRepository implements IRepository {
 
     if (data.name !== undefined) category.name = data.name;
     if (data.status !== undefined) category.status = data.status;
+    if (data.id !== undefined) category.id = data.id;
 
     category.validate();
 
@@ -152,5 +153,25 @@ export class CategoryRepository implements IRepository {
     });
 
     return categoriesWithProducts;
+  }
+
+  async listCategories(args?: FindAllArgs | undefined): Promise<CategoryDTO[]> {
+    const where = {
+      OR: args?.searchTerm
+        ? [
+            {
+              name: {
+                contains: args?.searchTerm,
+              },
+            },
+          ]
+        : undefined,
+    };
+
+    const data = await prisma.category.findMany({
+      where,
+    });
+
+    return data as CategoryDTO[];
   }
 }

@@ -20,6 +20,7 @@ export class Category {
   get name() {
     return this._name;
   }
+
   set id(id: string) {
     this._id = id;
   }

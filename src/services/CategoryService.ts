@@ -42,4 +42,9 @@ export class CategoryService implements IService {
 
     return result;
   }
+
+  async listCategories(args?: FindAllArgs | undefined) {
+    const result = await this.categoryRepository.listCategories(args);
+    return result;
+  }
 }
