@@ -6,6 +6,7 @@ import { authenticationHandler } from "../middlewares/authenticationHandler";
 import { categoryRoutes } from "./category.routes";
 import { productRoutes } from "./product.routes";
 import { clientRoutes } from "./client.routes";
+import { scheduleRoutes } from "./schedule.routes";
 
 const routes = Router();
 
@@ -14,6 +15,7 @@ routes.use("/clients", authenticationHandler, clientRoutes);
 routes.use("/categories", authenticationHandler, categoryRoutes);
 routes.use("/products", authenticationHandler, productRoutes);
 routes.use("/services", authenticationHandler, serviceRoutes);
+routes.use("/schedulings", authenticationHandler, scheduleRoutes);
 routes.use("/auth", authRoutes);
 
 export { routes };

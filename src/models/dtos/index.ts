@@ -5,3 +5,5 @@ export * from "./Status";
 export * from "./AddressDTO";
 export * from "./CategoryDTO";
 export * from "./ClientDTO";
+export * from "./ScheduleDTO";
+export * from "./ScheduleStatusDTO";

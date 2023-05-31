@@ -8,6 +8,7 @@ import { ProductRepository } from "../models/repositories/barbershop";
 
 export class ProductService implements IService {
   private productRepository = new ProductRepository();
+
   async create(data: ProductInputDTO) {
     const product = await this.productRepository.create(data);
 
@@ -25,9 +26,8 @@ export class ProductService implements IService {
 
     return changeProductStatus;
   }
-  async list(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
-    const result = await this.productRepository.findAll(args);
 
-    return result;
+  list(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
+    throw new Error("Method not implemented.");
   }
 }

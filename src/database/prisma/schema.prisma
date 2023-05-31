@@ -19,15 +19,34 @@ enum Status {
     inactive
 }
 
+enum ScheduleStatus {
+    scheduled
+    confirmed
+    awaiting_service
+    finished
+    canceled
+}
+
+enum DaysAvailable {
+    monday
+    tuesday
+    wednesday
+    thursday
+    friday
+    saturday
+    sunday
+}
+
 model Service {
-    id         String   @id @default(uuid())
-    name       String   @unique
+    id         String       @id @default(uuid())
+    name       String       @unique
     image      String?
     time       Int
     price      Float
-    status     Status   @default(active)
-    created_at DateTime @default(now())
-    updated_at DateTime @updatedAt
+    status     Status       @default(active)
+    created_at DateTime     @default(now())
+    updated_at DateTime     @updatedAt
+    schedules  Scheduling[]
 
     @@map("services")
 }
@@ -47,6 +66,7 @@ model Employee {
     address_id String         @unique
     created_at DateTime       @default(now())
     updated_at DateTime       @updatedAt
+    schedules  Scheduling[]
 
     @@map("employees")
 }
@@ -65,6 +85,7 @@ model Client {
     address_id String         @unique
     created_at DateTime       @default(now())
     updated_at DateTime       @updatedAt
+    scheduling Scheduling[]
 
     @@map("clients")
 }
@@ -107,4 +128,20 @@ model Product {
     category_id String?
 
     @@map("products")
+}
+
+model Scheduling {
+    id               String         @id @default(uuid())
+    appointment_date DateTime
+    client           Client         @relation(fields: [client_id], references: [id])
+    employee         Employee       @relation(fields: [employee_id], references: [id])
+    services         Service[]
+    estimated_time   DateTime
+    start_time       DateTime
+    end_time         DateTime
+    schedule_status  ScheduleStatus @default(scheduled)
+    client_id        String
+    employee_id      String
+
+    @@map("schedules")
 }
