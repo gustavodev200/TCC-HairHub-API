@@ -1,11 +1,11 @@
 import { z } from "zod";
 import { AppError, ErrorMessages } from "../../errors";
 
-export class OfficeHour {
+export class Shift {
   constructor(
-    private _start_time: Date,
-    private _end_time: Date,
-    private _days_available: string[],
+    private _start_time: string,
+    private _end_time: string,
+    private _available_days: number[],
     private _id?: string
   ) {}
 
@@ -17,31 +17,31 @@ export class OfficeHour {
     return this._end_time;
   }
 
-  get days_available() {
-    return this._days_available;
+  get available_days() {
+    return this._available_days;
   }
 
   get id() {
     return this._id!;
   }
 
-  set start_time(start_time: Date) {
+  set start_time(start_time: string) {
     this._start_time = start_time;
   }
 
-  set end_time(end_time: Date) {
+  set end_time(end_time: string) {
     this._end_time = end_time;
   }
 
-  set days_available(days_available: string[]) {
-    this._days_available = days_available;
+  set available_days(available_days: number[]) {
+    this._available_days = available_days;
   }
 
   toJSON() {
     return {
       start_time: this.start_time,
       end_time: this.end_time,
-      days_available: this.days_available,
+      available_days: this.available_days,
       id: this.id,
     };
   }
@@ -52,9 +52,12 @@ export class OfficeHour {
         id: z
           .string({ required_error: ErrorMessages.MSGE01 })
           .uuid("id inválido"),
-        start_time: z.date(),
-        end_time: z.date(),
-        days_available: z.array(z.string()),
+        start_time: z
+          .string({ required_error: ErrorMessages.MSGE01 })
+          .datetime({ offset: true }),
+        end_time: z
+          .string({ required_error: ErrorMessages.MSGE01 })
+          .datetime({ offset: true }),
       })
       .partial({ id: true });
 

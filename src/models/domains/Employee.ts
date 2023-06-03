@@ -4,6 +4,7 @@ import {
   AddressInputDTO,
   AssignmentType,
   GenericStatus,
+  ShiftInputDTO,
 } from "../dtos";
 import { User } from "./User";
 import { AppError, ErrorMessages } from "../../errors";
@@ -19,6 +20,7 @@ export class Employee extends User {
     _address: AddressInputDTO | AddressDTO,
     _email: string,
     _password: string,
+    _shifts?: ShiftInputDTO[],
     _id?: string,
     _status?: GenericStatus,
     _image?: string
@@ -34,7 +36,8 @@ export class Employee extends User {
       _password,
       _id,
       _status,
-      _image
+      _image,
+      _shifts
     );
   }
 
@@ -65,6 +68,24 @@ export class Employee extends User {
         password: z
           .string({ required_error: ErrorMessages.MSGE01 })
           .min(8, ErrorMessages.MSGE08),
+        shifts: z
+          .array(
+            z.object({
+              start_time: z
+                .string({ required_error: ErrorMessages.MSGE01 })
+                .datetime({ offset: true }),
+              end_time: z
+                .string({ required_error: ErrorMessages.MSGE01 })
+                .datetime({ offset: true }),
+
+              available_days: z
+                .array(z.number({ required_error: ErrorMessages.MSGE01 }))
+                .min(0)
+                .max(6, ErrorMessages.MSGE09),
+            })
+          )
+          .min(1, ErrorMessages.MSGE08)
+          .max(3, ErrorMessages.MSGE09),
       })
       .partial({ id: true, status: true });
 

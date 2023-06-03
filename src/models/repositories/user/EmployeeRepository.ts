@@ -2,12 +2,8 @@ import { prisma } from "../..";
 import bcrypt from "bcrypt";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgs, FindAllReturn, IRepository } from "../../../interfaces";
-import {
-  excludeFields,
-  generateRandomPassword,
-  parseArrayOfData,
-} from "../../../utils";
-import { Address, Employee } from "../../domains";
+import { excludeFields, generateRandomPassword } from "../../../utils";
+import { Address, Employee, Shift } from "../../domains";
 import { Mail } from "../../domains/Mail";
 import {
   AssignmentType,
@@ -15,6 +11,8 @@ import {
   EmployeeOutputDTO,
   GenericStatus,
   IUpdateEmployeeParams,
+  ShiftInputDTO,
+  ShiftOutputDTO,
 } from "../../dtos";
 import { hash } from "bcrypt";
 import { newPasswordEmailTemplate } from "../../../utils/firstAccessPassword";
@@ -61,6 +59,20 @@ export class EmployeeRepository implements IRepository {
 
       address.validate();
 
+      const shifts: ShiftInputDTO[] = [];
+
+      for (const shiftData of data.shifts) {
+        const shift = new Shift(
+          shiftData.start_time,
+          shiftData.end_time,
+          shiftData.available_days
+        );
+
+        shift.validate();
+
+        shifts.push(shift);
+      }
+
       const employee = new Employee(
         data.name,
         data.cpf,
@@ -69,10 +81,29 @@ export class EmployeeRepository implements IRepository {
         data.role,
         address.toJSON(),
         data.email,
-        hashedPassword
+        hashedPassword,
+        shifts
       );
 
       employee.validate();
+
+      const createdShifts = [];
+
+      for (const shiftData of data.shifts) {
+        const shift = await prisma.shift.create({
+          data: {
+            start_time: shiftData.start_time,
+            end_time: shiftData.end_time,
+            available_days: {
+              create: shiftData.available_days.map((day: any) => ({
+                day,
+              })),
+            },
+          },
+        });
+
+        createdShifts.push(shift);
+      }
 
       const createdEmployee = await prisma.employee.create({
         data: {
@@ -94,9 +125,19 @@ export class EmployeeRepository implements IRepository {
               number: employee.address.number,
             },
           },
+          shifts: {
+            connect: createdShifts.map((shift: any) => ({
+              id: shift.id,
+            })),
+          },
         },
         include: {
           address: true,
+          shifts: {
+            include: {
+              available_days: true,
+            },
+          },
         },
       });
 
@@ -118,6 +159,17 @@ export class EmployeeRepository implements IRepository {
           "address_id",
         ]),
 
+        shifts: createdEmployee.shifts.map((shift) => {
+          return {
+            id: shift.id,
+            start_time: shift.start_time,
+            end_time: shift.end_time,
+            available_days: shift.available_days.map(({ day }) => {
+              return day;
+            }),
+          };
+        }),
+
         address: excludeFields(createdEmployee.address, [
           "created_at",
           "updated_at",
@@ -137,8 +189,26 @@ export class EmployeeRepository implements IRepository {
         where: { id },
         include: {
           address: true,
+          shifts: {
+            include: {
+              available_days: true,
+            },
+          },
         },
       });
+
+      const dataEmployeeToUpdate = {
+        shifts: employeeToUpdate?.shifts.map((shift) => {
+          return {
+            id: shift.id,
+            start_time: shift.start_time,
+            end_time: shift.end_time,
+            available_days: shift.available_days.map(({ day }) => {
+              return day;
+            }),
+          };
+        }),
+      };
 
       if (!employeeToUpdate) {
         throw new AppError(ErrorMessages.MSGE05, 404);
@@ -158,6 +228,100 @@ export class EmployeeRepository implements IRepository {
         address.validate();
       }
 
+      const shiftsToUpdates: ShiftOutputDTO[] = [];
+      const newShiftsList: string[] = [];
+
+      if (data.shifts) {
+        const shiftsToDelete =
+          dataEmployeeToUpdate.shifts?.filter(
+            (shift: any) => !data.shifts?.some((s: any) => s.id === shift.id)
+          ) ?? [];
+
+        if (shiftsToDelete.length > 0) {
+          for (const shiftData of shiftsToDelete) {
+            await prisma.shift.delete({
+              where: {
+                id: shiftData.id,
+              },
+            });
+          }
+        }
+
+        for await (const shiftData of data.shifts) {
+          if (!shiftData.id) {
+            const newShift = await prisma.shift.create({
+              data: {
+                start_time: shiftData.start_time,
+                end_time: shiftData.end_time,
+                available_days: {
+                  create: shiftData.available_days.map((day: any) => ({
+                    day,
+                  })),
+                },
+              },
+            });
+
+            newShiftsList.push(newShift.id);
+          }
+        }
+
+        for (let i = 0; i < data.shifts.length; i++) {
+          if (
+            JSON.stringify(data.shifts[i]) !==
+            JSON.stringify(dataEmployeeToUpdate.shifts?.[i])
+          ) {
+            shiftsToUpdates.push(data.shifts[i]);
+          }
+        }
+
+        if (shiftsToUpdates.length > 0) {
+          for (const shiftData of shiftsToUpdates) {
+            const index = dataEmployeeToUpdate.shifts?.findIndex(
+              (shift) => shift.id === shiftData.id
+            );
+
+            let needsToUpdateAvailableDays = false;
+
+            if (index !== -1 && index !== undefined) {
+              needsToUpdateAvailableDays =
+                JSON.stringify(shiftData.available_days) !==
+                JSON.stringify(
+                  dataEmployeeToUpdate.shifts?.[index].available_days
+                );
+
+              if (needsToUpdateAvailableDays) {
+                await prisma.availableDays.deleteMany({
+                  where: {
+                    shifts: {
+                      some: {
+                        id: shiftData.id,
+                      },
+                    },
+                  },
+                });
+              }
+
+              await prisma.shift.update({
+                where: {
+                  id: shiftData.id,
+                },
+                data: {
+                  start_time: shiftData.start_time,
+                  end_time: shiftData.end_time,
+                  available_days: needsToUpdateAvailableDays
+                    ? {
+                        create: shiftData.available_days.map((day: any) => ({
+                          day,
+                        })),
+                      }
+                    : undefined,
+                },
+              });
+            }
+          }
+        }
+      }
+
       const employee = new Employee(
         employeeToUpdate.name,
         employeeToUpdate.cpf,
@@ -167,6 +331,11 @@ export class EmployeeRepository implements IRepository {
         address.toJSON(),
         employeeToUpdate.email,
         employeeToUpdate.password,
+        dataEmployeeToUpdate.shifts?.map((shift: any) => ({
+          ...shift,
+          start_time: shift.start_time.toISOString(),
+          end_time: shift.end_time.toISOString(),
+        })),
         employeeToUpdate.id,
         employeeToUpdate.status as GenericStatus
       );
@@ -179,15 +348,23 @@ export class EmployeeRepository implements IRepository {
       if (data.email !== undefined) employee.email = data.email;
       if (data.password !== undefined) employee.password = data.password;
       if (data.status !== undefined) employee.status = data.status;
+      if (data.shifts !== undefined) employee.shifts = data.shifts;
 
       employee.validate();
 
-      if (
-        employee.email !== employeeToUpdate.email ||
-        employee.cpf !== employeeToUpdate.cpf
-      ) {
+      if (employee.cpf !== employeeToUpdate.cpf) {
         const existingEmployee = await prisma.employee.findFirst({
-          where: { OR: [{ cpf: employee.cpf }, { email: employee.email }] },
+          where: { cpf: employee.cpf },
+        });
+
+        if (existingEmployee) {
+          throw new AppError(ErrorMessages.MSGE02);
+        }
+      }
+
+      if (employee.email !== employeeToUpdate.email) {
+        const existingEmployee = await prisma.employee.findFirst({
+          where: { email: employee.email },
         });
 
         if (existingEmployee) {
@@ -220,9 +397,24 @@ export class EmployeeRepository implements IRepository {
               ...address.toJSON(),
             },
           },
+          shifts:
+            newShiftsList.length > 0
+              ? {
+                  connect: newShiftsList.map((id) => ({ id })),
+                }
+              : undefined,
         },
         include: {
           address: true,
+          shifts: {
+            include: {
+              available_days: {
+                orderBy: {
+                  day: "asc",
+                },
+              },
+            },
+          },
         },
       });
 
@@ -247,6 +439,16 @@ export class EmployeeRepository implements IRepository {
           "password",
           "address_id",
         ]),
+
+        shifts: updatedEmployee.shifts.map((shift) => {
+          return {
+            ...shift,
+            available_days: shift.available_days.map(({ day }) => {
+              return day;
+            }),
+          };
+        }),
+
         address: excludeFields(updatedEmployee.address, [
           "created_at",
           "updated_at",
@@ -259,6 +461,7 @@ export class EmployeeRepository implements IRepository {
       throw new AppError(ErrorMessages.MSGE05, 404);
     }
   }
+
   async findAll(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
     const where = {
       OR: args?.searchTerm
@@ -291,7 +494,13 @@ export class EmployeeRepository implements IRepository {
       where,
       include: {
         address: true,
+        shifts: {
+          include: {
+            available_days: true,
+          },
+        },
       },
+
       skip: args?.skip,
       take: args?.take,
       orderBy: {
@@ -306,6 +515,15 @@ export class EmployeeRepository implements IRepository {
         "password",
         "address_id",
       ]),
+
+      shifts: employee.shifts.map((shift) => {
+        return {
+          ...shift,
+          available_days: shift.available_days.map(({ day }) => {
+            return day;
+          }),
+        };
+      }),
 
       address: excludeFields(employee.address, ["created_at", "updated_at"]),
     }));

@@ -8,3 +8,4 @@ export * from "./Product";
 export * from "./Category";
 export * from "./Client";
 export * from "./Schedule";
+export * from "./Shift";

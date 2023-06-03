@@ -1,4 +1,10 @@
-import { AddressDTO, AddressInputDTO, GenericStatus } from "../dtos";
+import {
+  AddressDTO,
+  AddressInputDTO,
+  GenericStatus,
+  ShiftInputDTO,
+  ShiftOutputDTO,
+} from "../dtos";
 import { AssignmentType } from "@prisma/client";
 export class User {
   constructor(
@@ -12,7 +18,8 @@ export class User {
     private _password: string,
     private _id?: string,
     private _status?: GenericStatus,
-    private _image?: string
+    private _image?: string,
+    private _shifts?: ShiftInputDTO[]
   ) {}
 
   get name() {
@@ -53,6 +60,10 @@ export class User {
   }
   get status() {
     return this._status!;
+  }
+
+  get shifts() {
+    return this._shifts!;
   }
 
   set name(name: string) {
@@ -97,5 +108,9 @@ export class User {
 
   set status(status: GenericStatus) {
     this._status = status;
+  }
+
+  set shifts(shifts: ShiftInputDTO[]) {
+    this._shifts = shifts;
   }
 }

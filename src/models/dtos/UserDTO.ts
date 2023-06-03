@@ -1,5 +1,5 @@
-import { Address } from "../domains";
 import { AddressDTO, AddressInputDTO } from "./AddressDTO";
+import { ShiftInputDTO, ShiftOutputDTO } from "./ShiftDTO";
 import { GenericStatus } from "./Status";
 
 export enum AssignmentType {
@@ -27,6 +27,7 @@ export interface IUpdateEmployeeParams {
   address?: AddressDTO;
   password?: string;
   status?: GenericStatus;
+  shifts?: ShiftOutputDTO[];
 }
 
 // Employee Input DTO
@@ -40,6 +41,7 @@ export interface EmployeeInputDTO {
   email: string;
   role: AssignmentType;
   address: AddressInputDTO;
+  shifts: ShiftInputDTO[];
 }
 
 // Employee Output DTO

@@ -27,16 +27,6 @@ enum ScheduleStatus {
     canceled
 }
 
-enum DaysAvailable {
-    monday
-    tuesday
-    wednesday
-    thursday
-    friday
-    saturday
-    sunday
-}
-
 model Service {
     id         String       @id @default(uuid())
     name       String       @unique
@@ -64,11 +54,33 @@ model Employee {
     role       AssignmentType @default(employee)
     address    Address        @relation(fields: [address_id], references: [id])
     address_id String         @unique
+    schedules  Scheduling[]
+    shifts     Shift[]
     created_at DateTime       @default(now())
     updated_at DateTime       @updatedAt
-    schedules  Scheduling[]
 
     @@map("employees")
+}
+
+model Shift {
+    id             String          @id @default(uuid())
+    start_time     DateTime
+    end_time       DateTime
+    available_days AvailableDays[]
+    Employee       Employee?       @relation(fields: [employee_id], references: [id])
+    employee_id    String?
+    created_at     DateTime        @default(now())
+    updated_at     DateTime        @updatedAt
+
+    @@map("shifts")
+}
+
+model AvailableDays {
+    id     String  @id @default(uuid())
+    day    Int
+    shifts Shift[]
+
+    @@map("days_available")
 }
 
 model Client {
