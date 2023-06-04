@@ -17,6 +17,7 @@ import {
 import { hash } from "bcrypt";
 import { newPasswordEmailTemplate } from "../../../utils/firstAccessPassword";
 import { firstAccessEmailTemplate } from "../../../utils/newPassword";
+import dayjs from "dayjs";
 
 export class EmployeeRepository implements IRepository {
   async create(data: EmployeeInputDTO) {
@@ -90,6 +91,7 @@ export class EmployeeRepository implements IRepository {
       const createdShifts = [];
 
       for (const shiftData of data.shifts) {
+        const index = data.shifts.indexOf(shiftData);
         const shift = await prisma.shift.create({
           data: {
             start_time: shiftData.start_time,
@@ -99,6 +101,10 @@ export class EmployeeRepository implements IRepository {
                 day,
               })),
             },
+
+            created_at: dayjs()
+              .set("millisecond", 0 + index)
+              .toDate(),
           },
         });
 
@@ -497,6 +503,9 @@ export class EmployeeRepository implements IRepository {
         shifts: {
           include: {
             available_days: true,
+          },
+          orderBy: {
+            created_at: "asc",
           },
         },
       },

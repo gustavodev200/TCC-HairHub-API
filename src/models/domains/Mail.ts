@@ -2,14 +2,14 @@ import nodemailer from "nodemailer";
 
 export class Mail {
   private transporter = nodemailer.createTransport({
-    host: "smtp.office365.com",
+    service: "gmail",
+    host: "smtp.gmail.com",
     port: 587,
     secure: false,
     auth: {
-      user: process.env.USER_SEND_EMAIL,
-      pass: process.env.PASSWORD_SEND_EMAIL,
+      user: process.env.EMAIL_PROVIDER_USER,
+      pass: process.env.EMAIL_PROVIDER_PASSWORD,
     },
-    tls: { ciphers: "SSLv3" },
   });
 
   public async sendMail(
@@ -18,7 +18,7 @@ export class Mail {
     message: string
   ): Promise<string> {
     const mailOptions = {
-      from: process.env.USER_SEND_EMAIL,
+      from: process.env.EMAIL_PROVIDER_USER,
       to,
       subject,
       html: message,
