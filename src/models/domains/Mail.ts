@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { AppError } from "../../errors";
 
 export class Mail {
   private transporter = nodemailer.createTransport({
@@ -12,23 +13,16 @@ export class Mail {
     },
   });
 
-  public async sendMail(
-    to: string,
-    subject: string,
-    message: string
-  ): Promise<string> {
-    const mailOptions = {
-      from: process.env.EMAIL_PROVIDER_USER,
-      to,
-      subject,
-      html: message,
-    };
-
+  async sendMail(to: string, subject: string, message: string) {
     try {
-      const info = await this.transporter.sendMail(mailOptions);
-      return `Mensagem enviada para ${to}: ${info.messageId}`;
+      await this.transporter.sendMail({
+        from: process.env.EMAIL_PROVIDER_USER,
+        to,
+        subject,
+        html: message,
+      });
     } catch (error) {
-      return `Erro ao enviar mensagem para ${to}: ${error}`;
+      throw new AppError(`Erro ao enviar mensagem para ${to}: ${error} `);
     }
   }
 }

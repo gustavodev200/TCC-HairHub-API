@@ -42,13 +42,6 @@ export class EmployeeRepository implements IRepository {
         Number(process.env.PASSWORD_LENGTH)
       );
 
-      const mail = new Mail();
-
-      const hashedPassword = await hash(
-        passwordAccessEmail || "",
-        Number(process.env.BCRYPT_SALT)
-      );
-
       const address = new Address(
         data.address.cep,
         data.address.city,
@@ -73,6 +66,13 @@ export class EmployeeRepository implements IRepository {
 
         shifts.push(shift);
       }
+
+      const mail = new Mail();
+
+      const hashedPassword = await hash(
+        passwordAccessEmail,
+        Number(process.env.BCRYPT_SALT)
+      );
 
       const employee = new Employee(
         data.name,
