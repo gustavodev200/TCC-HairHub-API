@@ -6,6 +6,7 @@ export class Shift {
     private _start_time: string,
     private _end_time: string,
     private _available_days: number[],
+    private _order: number,
     private _id?: string
   ) {}
 
@@ -25,6 +26,10 @@ export class Shift {
     return this._id!;
   }
 
+  get order() {
+    return this._order;
+  }
+
   set start_time(start_time: string) {
     this._start_time = start_time;
   }
@@ -37,12 +42,21 @@ export class Shift {
     this._available_days = available_days;
   }
 
+  set id(id: string) {
+    this._id = id;
+  }
+
+  set order(order: number) {
+    this._order = order;
+  }
+
   toJSON() {
     return {
       start_time: this.start_time,
       end_time: this.end_time,
       available_days: this.available_days,
       id: this.id,
+      order: this.order,
     };
   }
 

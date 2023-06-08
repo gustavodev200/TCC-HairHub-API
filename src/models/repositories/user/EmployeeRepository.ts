@@ -59,10 +59,48 @@ export class EmployeeRepository implements IRepository {
         const shift = new Shift(
           shiftData.start_time,
           shiftData.end_time,
-          shiftData.available_days
+          shiftData.available_days,
+          shiftData.order
         );
 
         shift.validate();
+
+        if (data.shifts.length > 1) {
+          const shiftsWithSameDay = data.shifts.filter((s) =>
+            s.available_days.some((day) =>
+              shiftData.available_days.includes(day)
+            )
+          );
+
+          if (shiftsWithSameDay.length > 1) {
+            const dayjsStartTime = dayjs()
+              .set("hour", dayjs(shiftData.start_time).get("hour"))
+              .set("minute", dayjs(shiftData.start_time).get("minute"));
+            const dayjsEndTime = dayjs()
+              .set("hour", dayjs(shiftData.end_time).get("hour"))
+              .set("minute", dayjs(shiftData.end_time).get("minute"));
+
+            const isOverlapping = shiftsWithSameDay.some(
+              (schedule) =>
+                (dayjs(dayjsStartTime).isAfter(schedule.start_time, "minute") &&
+                  dayjs(dayjsStartTime).isBefore(
+                    schedule.end_time,
+                    "minute"
+                  )) ||
+                (dayjs(dayjsEndTime).isAfter(schedule.start_time, "minute") &&
+                  dayjs(dayjsEndTime).isBefore(schedule.end_time, "minute")) ||
+                (dayjs(dayjsStartTime).isBefore(
+                  schedule.start_time,
+                  "minute"
+                ) &&
+                  dayjs(dayjsEndTime).isAfter(schedule.end_time, "minute")) ||
+                (dayjs(dayjsStartTime).isSame(schedule.start_time, "minute") &&
+                  dayjs(dayjsEndTime).isSame(schedule.end_time, "minute"))
+            );
+
+            if (isOverlapping) throw new AppError(ErrorMessages.MSGE02);
+          }
+        }
 
         shifts.push(shift);
       }
@@ -96,6 +134,7 @@ export class EmployeeRepository implements IRepository {
           data: {
             start_time: shiftData.start_time,
             end_time: shiftData.end_time,
+            order: shiftData.order,
             available_days: {
               create: shiftData.available_days.map((day: any) => ({
                 day,
@@ -140,6 +179,9 @@ export class EmployeeRepository implements IRepository {
         include: {
           address: true,
           shifts: {
+            orderBy: {
+              order: "asc",
+            },
             include: {
               available_days: true,
             },
@@ -254,6 +296,51 @@ export class EmployeeRepository implements IRepository {
         }
 
         for await (const shiftData of data.shifts) {
+          if (data.shifts.length > 1) {
+            const shiftsWithSameDay = data.shifts.filter((s) =>
+              s.available_days.some((day) =>
+                shiftData.available_days.includes(day)
+              )
+            );
+
+            if (shiftsWithSameDay.length > 1) {
+              const dayjsStartTime = dayjs()
+                .set("hour", dayjs(shiftData.start_time).get("hour"))
+                .set("minute", dayjs(shiftData.start_time).get("minute"));
+              const dayjsEndTime = dayjs()
+                .set("hour", dayjs(shiftData.end_time).get("hour"))
+                .set("minute", dayjs(shiftData.end_time).get("minute"));
+
+              const isOverlapping = shiftsWithSameDay.some(
+                (schedule) =>
+                  (dayjs(dayjsStartTime).isAfter(
+                    schedule.start_time,
+                    "minute"
+                  ) &&
+                    dayjs(dayjsStartTime).isBefore(
+                      schedule.end_time,
+                      "minute"
+                    )) ||
+                  (dayjs(dayjsEndTime).isAfter(schedule.start_time, "minute") &&
+                    dayjs(dayjsEndTime).isBefore(
+                      schedule.end_time,
+                      "minute"
+                    )) ||
+                  (dayjs(dayjsStartTime).isBefore(
+                    schedule.start_time,
+                    "minute"
+                  ) &&
+                    dayjs(dayjsEndTime).isAfter(schedule.end_time, "minute")) ||
+                  (dayjs(dayjsStartTime).isSame(
+                    schedule.start_time,
+                    "minute"
+                  ) &&
+                    dayjs(dayjsEndTime).isSame(schedule.end_time, "minute"))
+              );
+
+              if (isOverlapping) throw new AppError(ErrorMessages.MSGE02);
+            }
+          }
           if (!shiftData.id) {
             const newShift = await prisma.shift.create({
               data: {
@@ -413,12 +500,11 @@ export class EmployeeRepository implements IRepository {
         include: {
           address: true,
           shifts: {
+            orderBy: {
+              order: "asc",
+            },
             include: {
-              available_days: {
-                orderBy: {
-                  day: "asc",
-                },
-              },
+              available_days: true,
             },
           },
         },
@@ -501,20 +587,17 @@ export class EmployeeRepository implements IRepository {
       include: {
         address: true,
         shifts: {
+          orderBy: {
+            order: "asc",
+          },
           include: {
             available_days: true,
-          },
-          orderBy: {
-            created_at: "asc",
           },
         },
       },
 
       skip: args?.skip,
       take: args?.take,
-      orderBy: {
-        status: "asc",
-      },
     });
 
     const dataToUse = data.map((employee) => ({

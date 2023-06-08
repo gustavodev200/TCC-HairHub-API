@@ -45,16 +45,16 @@ export class ScheduleRepository implements IRepository {
         end_time: schedule.end_time,
         client: {
           connect: {
-            id: schedule.client.id,
+            // id: schedule.client.id,
           },
         },
         employee: {
           connect: {
-            id: schedule.employee.id,
+            // id: schedule.employee.id,
           },
         },
         services: {
-          connect: schedule.services,
+          // connect: schedule.services,
         },
         schedule_status: schedule.schedule_status,
         estimated_time: schedule.estimated_time,

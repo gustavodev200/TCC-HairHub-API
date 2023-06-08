@@ -287,9 +287,6 @@ export class ClientRepository implements IRepository {
       },
       skip: args?.skip,
       take: args?.take,
-      orderBy: {
-        status: "asc",
-      },
     });
 
     const dataToUse = data.map((client) => ({
