@@ -8,8 +8,8 @@ export interface ScheduleInputDTO {
   start_time: string;
   end_time: string;
   services: string[];
-  client_id: string;
-  employee_id: string;
+  client: string;
+  employee: EmployeeOutputDTO;
 }
 
 export interface ScheduleOutputDTO extends ScheduleInputDTO {

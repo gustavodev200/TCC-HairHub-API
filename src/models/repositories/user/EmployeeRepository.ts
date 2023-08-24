@@ -20,7 +20,7 @@ import { firstAccessEmailTemplate } from "../../../utils/newPassword";
 import dayjs from "dayjs";
 
 export class EmployeeRepository implements IRepository {
-  async create(data: EmployeeInputDTO) {
+  async create(data: EmployeeInputDTO): Promise<EmployeeOutputDTO> {
     try {
       const existingEmployeeByCpf = await prisma.employee.findUnique({
         where: {

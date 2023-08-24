@@ -2,29 +2,48 @@ import { prisma } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { IRepository } from "../../../interfaces";
 import { Schedule } from "../../domains";
-import { ScheduleInputDTO, ScheduleOutputDTO } from "../../dtos";
+import {
+  EmployeeOutputDTO,
+  ScheduleInputDTO,
+  ScheduleOutputDTO,
+} from "../../dtos";
 
 export class ScheduleRepository implements IRepository {
   async create({
     appointment_date,
     start_time,
-    end_time,
     services,
-    client_id,
-    employee_id,
+    end_time,
+    client,
+    employee,
   }: ScheduleInputDTO): Promise<ScheduleOutputDTO> {
-    const existingSchedule = await prisma.scheduling.findFirst({
+    // Validar se a data selecionada tem algum barbeiro disponível naquele horário
+    const isEmployeeAvailable = await prisma.scheduling.findFirst({
       where: {
-        appointment_date,
-        start_time,
-        end_time,
-        client_id,
-        employee_id,
+        appointment_date: appointment_date,
+        employee_id: employee.id,
       },
     });
 
-    if (existingSchedule) {
-      throw new AppError(ErrorMessages.MSGE02);
+    if (isEmployeeAvailable) {
+      throw new AppError(
+        "O barbeiro selecionado não está disponível na data e horário especificados."
+      );
+    }
+
+    // Validar se o horário informado está dentro do turno do barbeiro
+    const employeeShift = await prisma.shift.findFirst({
+      where: {
+        employee_id: employee.id,
+        start_time: { $lte: new Date(start_time) }, // Verifica se o início do turno é menor ou igual ao horário informado
+        end_time: { $gte: new Date(end_time) }, // Verifica se o término do turno é maior ou igual ao horário informado
+      },
+    });
+
+    if (!employeeShift) {
+      throw new AppError(
+        "O horário informado não está dentro do turno do barbeiro selecionado."
+      );
     }
 
     const schedule = new Schedule(
@@ -32,8 +51,8 @@ export class ScheduleRepository implements IRepository {
       start_time,
       end_time,
       services,
-      client_id,
-      employee_id
+      client,
+      employee
     );
 
     schedule.validate();

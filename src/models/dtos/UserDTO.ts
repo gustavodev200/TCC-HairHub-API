@@ -56,6 +56,7 @@ export interface EmployeeOutputDTO {
   status: GenericStatus;
   role: AssignmentType;
   address: AddressOutputDTO;
+  shifts: ShiftInputDTO[];
   adress_id: string;
   created_at: Date;
   updated_at: Date;

@@ -14,8 +14,8 @@ export class Schedule {
     private _start_time: string,
     private _end_time: string,
     private _services: string[],
-    private _client_id: string,
-    private _employee_id: string,
+    private _client: string,
+    private _employee: string,
     private _estimated_time?: Date,
     private _schedule_status?: ScheduleStatus,
     private _id?: string
@@ -50,11 +50,11 @@ export class Schedule {
   }
 
   get client() {
-    return this._client_id;
+    return this._client;
   }
 
   get employee() {
-    return this._employee_id;
+    return this._employee;
   }
 
   set id(id: string) {
@@ -86,11 +86,11 @@ export class Schedule {
   }
 
   set client(client: string) {
-    this._client_id = client;
+    this._client = client;
   }
 
   set employee(employee: string) {
-    this._employee_id = employee;
+    this._employee = employee;
   }
 
   toJSON() {
@@ -101,8 +101,8 @@ export class Schedule {
       end_time: this.end_time,
       estimated_time: this.estimated_time,
       service_id: this.services,
-      client_id: this.client,
-      employee_id: this.employee,
+      client: this.client,
+      employee: this.employee,
       status: this.status,
     };
   }
