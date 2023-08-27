@@ -64,8 +64,8 @@ model Employee {
 
 model Shift {
     id             String          @id @default(uuid())
-    start_time     DateTime
-    end_time       DateTime
+    start_time     DateTime        @db.Time()
+    end_time       DateTime        @db.Time()
     available_days AvailableDays[]
     Employee       Employee?       @relation(fields: [employee_id], references: [id])
     employee_id    String?
@@ -150,8 +150,8 @@ model Scheduling {
     employee         Employee       @relation(fields: [employee_id], references: [id])
     services         Service[]
     estimated_time   DateTime
-    start_time       DateTime
-    end_time         DateTime
+    start_time       DateTime       @db.Time()
+    end_time         DateTime       @db.Time()
     schedule_status  ScheduleStatus @default(scheduled)
     client_id        String
     employee_id      String

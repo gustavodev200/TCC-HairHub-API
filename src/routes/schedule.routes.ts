@@ -3,13 +3,13 @@ import CreateScheduleController from "../controllers/barbershop/schedules/Create
 
 const scheduleRoutes = Router();
 
-//create product
+//create schedule
 scheduleRoutes.post("/", CreateScheduleController.handle);
-//update product
+//update schedules
 // scheduleRoutes.put("/:id", UpdateProductController.handle);
-//list product
+//list schedules
 // scheduleRoutes.get("/", ListProductController.handle);
-//change status product
+//change schedules
 // scheduleRoutes.patch("/:id", ChangeProductController.handle);
 
 export { scheduleRoutes };
