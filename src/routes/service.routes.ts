@@ -7,12 +7,14 @@ import {
   ChangeServiceStatusController,
   CreateServiceController,
   ListServiceController,
+  ListServicesOnlyController,
   UpdateServiceController,
 } from "../controllers/barbershop/servicesBarbershop";
 
 //controllers
 const createServiceController = new CreateServiceController();
 const listServiceController = new ListServiceController();
+const listServiceOnlyController = new ListServicesOnlyController();
 const updateServiceController = new UpdateServiceController();
 const changeServiceStatusController = new ChangeServiceStatusController();
 
@@ -33,5 +35,6 @@ serviceRoutes.put(
 );
 serviceRoutes.get("/", listServiceController.handle);
 serviceRoutes.patch("/:id", changeServiceStatusController.handle);
+serviceRoutes.get("/list", listServiceOnlyController.handle);
 
 export { serviceRoutes };

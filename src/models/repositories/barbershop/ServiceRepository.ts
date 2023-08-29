@@ -119,4 +119,10 @@ export class ServiceRepository implements IRepository {
       totalItems,
     };
   }
+
+  public async listServices() {
+    const data = await prisma.service.findMany();
+
+    return data as IServiceOutputDTO[];
+  }
 }

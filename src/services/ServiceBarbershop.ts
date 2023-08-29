@@ -3,6 +3,7 @@ import { FindAllArgs, FindAllReturn } from "../interfaces/IRepository";
 import { GenericStatus } from "../models/dtos";
 import {
   IServiceInputDTO,
+  IServiceOutputDTO,
   IUpdateServiceParams,
 } from "../models/dtos/ServiceDTO";
 import { ServiceRepository } from "../models/repositories/barbershop";
@@ -32,5 +33,11 @@ export class ServiceBarbershop implements IService {
     const result = await this.serviceRepository.findAll(args);
 
     return result;
+  }
+
+  public async listServices(): Promise<IServiceOutputDTO[]> {
+    const service = await this.serviceRepository.listServices();
+
+    return service;
   }
 }
