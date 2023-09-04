@@ -25,7 +25,10 @@ export class CreateServiceController {
       throw new AppError(ErrorMessages.MSGE02, 404);
     }
 
-    const { imageURL } = await cloudinaryInstance.uploadImage(localFilePath);
+    const { imageURL } = await cloudinaryInstance.uploadImage(
+      localFilePath,
+      "services"
+    );
 
     const serviceBarbershop = new ServiceBarbershop();
 

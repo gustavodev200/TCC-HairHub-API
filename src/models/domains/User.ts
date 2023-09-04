@@ -16,9 +16,9 @@ export class User {
     private _address: AddressInputDTO | AddressDTO,
     private _email: string,
     private _password: string,
+    private _image?: string,
     private _id?: string,
     private _status?: GenericStatus,
-    private _image?: string,
     private _shifts?: ShiftInputDTO[]
   ) {}
 

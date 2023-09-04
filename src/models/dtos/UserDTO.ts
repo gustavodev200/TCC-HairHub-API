@@ -18,6 +18,7 @@ export interface UserInterface {
 
 export interface IUpdateEmployeeParams {
   id?: string;
+  image?: string;
   name?: string;
   cpf?: string;
   dataNasc?: string;
@@ -33,6 +34,7 @@ export interface IUpdateEmployeeParams {
 // Employee Input DTO
 
 export interface EmployeeInputDTO {
+  image?: string;
   cep: string;
   name: string;
   cpf: string;

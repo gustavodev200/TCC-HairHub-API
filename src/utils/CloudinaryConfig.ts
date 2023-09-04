@@ -13,12 +13,15 @@ export class Cloudinary implements ICloudinary {
     });
   }
   public uploadImage = async (
-    imageToUpload: string
+    imageToUpload: string,
+    folder: string
   ): Promise<ICloudinaryResponse> => {
     try {
       const cloudinaryImageUploadResponse = await cloudinary.uploader.upload(
         imageToUpload,
+
         {
+          folder: folder,
           public_id: process.env.CLOUDINARY_CLOUD_NAME,
         }
       );

@@ -3,5 +3,8 @@ export interface ICloudinaryResponse {
 }
 
 export interface ICloudinary {
-  uploadImage: (imageToUpload: string) => Promise<ICloudinaryResponse>;
+  uploadImage: (
+    imageToUpload: string,
+    folder: string
+  ) => Promise<ICloudinaryResponse>;
 }

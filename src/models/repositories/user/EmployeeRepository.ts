@@ -114,6 +114,7 @@ export class EmployeeRepository implements IRepository {
 
       const employee = new Employee(
         data.name,
+
         data.cpf,
         data.dataNasc,
         data.phone,
@@ -122,6 +123,7 @@ export class EmployeeRepository implements IRepository {
         data.email,
         hashedPassword,
         shifts
+        // data.image
       );
 
       employee.validate();
@@ -183,7 +185,11 @@ export class EmployeeRepository implements IRepository {
               order: "asc",
             },
             include: {
-              available_days: true,
+              available_days: {
+                orderBy: {
+                  day: "asc",
+                },
+              },
             },
           },
         },
@@ -591,7 +597,11 @@ export class EmployeeRepository implements IRepository {
             order: "asc",
           },
           include: {
-            available_days: true,
+            available_days: {
+              orderBy: {
+                day: "asc",
+              },
+            },
           },
         },
       },

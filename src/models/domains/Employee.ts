@@ -34,9 +34,9 @@ export class Employee extends User {
       _address,
       _email,
       _password,
+      _image,
       _id,
       _status,
-      _image,
       _shifts
     );
   }

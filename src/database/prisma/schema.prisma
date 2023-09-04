@@ -144,17 +144,15 @@ model Product {
 }
 
 model Scheduling {
-    id               String         @id @default(uuid())
-    appointment_date DateTime
-    client           Client         @relation(fields: [client_id], references: [id])
-    employee         Employee       @relation(fields: [employee_id], references: [id])
-    services         Service[]
-    estimated_time   DateTime
-    start_time       DateTime       @db.Time()
-    end_time         DateTime       @db.Time()
-    schedule_status  ScheduleStatus @default(scheduled)
-    client_id        String
-    employee_id      String
+    id              String         @id @default(uuid())
+    client          Client         @relation(fields: [client_id], references: [id])
+    employee        Employee       @relation(fields: [employee_id], references: [id])
+    services        Service[]
+    start_date_time DateTime
+    end_date_time   DateTime
+    schedule_status ScheduleStatus @default(scheduled)
+    client_id       String
+    employee_id     String
 
     @@map("schedules")
 }
