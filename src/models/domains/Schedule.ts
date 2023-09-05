@@ -17,7 +17,7 @@ export class Schedule {
     return this._id!;
   }
 
-  get status() {
+  get schedule_status() {
     return this._schedule_status!;
   }
 
@@ -74,10 +74,10 @@ export class Schedule {
       id: this.id,
       start_time: this.start_date_time,
       end_time: this.end_date_time,
-      service_id: this.services,
+      services: this.services,
       client: this.client,
       employee: this.employee,
-      status: this.status,
+      schedule_status: this.schedule_status,
     };
   }
 

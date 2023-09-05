@@ -1,11 +1,14 @@
 import { prisma } from "../..";
+import { AppError, ErrorMessages } from "../../../errors";
 import { IRepository } from "../../../interfaces";
 import { excludeFields } from "../../../utils";
 import { Schedule } from "../../domains";
 import {
+  EmployeeOutputDTO,
   ScheduleInputDTO,
   ScheduleOutputDTO,
   ScheduleStatus,
+  SchedulesUpdateParamsDTO,
 } from "../../dtos";
 
 import dayjs from "dayjs";
@@ -105,7 +108,66 @@ export class ScheduleRepository implements IRepository {
     return "Barbeiro não disponivel";
   }
 
-  async update(id: string, data: unknown): Promise<unknown> {
-    throw new Error("Method not implemented.");
+  async update(
+    id: string,
+    data: SchedulesUpdateParamsDTO
+  ): Promise<ScheduleOutputDTO> {
+    try {
+      const scheduleToUpdate = await prisma.scheduling.findUniqueOrThrow({
+        where: { id },
+        include: {
+          services: true,
+        },
+      });
+
+      //colocarvalidações se já existe esse agendamento
+
+      const schedule = new Schedule(
+        dayjs(scheduleToUpdate.start_date_time).toISOString(),
+        dayjs(scheduleToUpdate.end_date_time).toISOString(),
+        scheduleToUpdate.services.map((service) => service.id),
+        scheduleToUpdate.client_id,
+        scheduleToUpdate.employee_id,
+        scheduleToUpdate.schedule_status as ScheduleStatus,
+        scheduleToUpdate.id
+      );
+
+      if (data.client !== undefined) schedule.client = data.client;
+      if (data.employee !== undefined) schedule.employee = data.employee;
+      if (data.end_date_time !== undefined)
+        schedule.end_date_time = data.end_date_time;
+      if (data.start_date_time !== undefined)
+        schedule.start_date_time = data.start_date_time;
+      if (data.services !== undefined) schedule.services = data.services;
+      if (data.schedule_status !== undefined)
+        schedule.schedule_status = data.schedule_status;
+
+      schedule.validate();
+
+      const updatedSchedule = await prisma.scheduling.update({
+        where: { id },
+        data: {
+          start_date_time: schedule.start_date_time,
+          end_date_time: schedule.end_date_time,
+          client_id: schedule.client,
+          employee_id: schedule.employee,
+          schedule_status: schedule.schedule_status as ScheduleStatus,
+          services: {
+            connect: schedule.services.map((service) => ({
+              id: service,
+            })),
+          },
+        },
+        include: {
+          services: true,
+        },
+      });
+
+      return updatedSchedule as unknown as ScheduleOutputDTO;
+    } catch (error) {
+      if (error instanceof AppError || error instanceof Error) throw error;
+
+      throw new AppError(ErrorMessages.MSGE05, 404);
+    }
   }
 }

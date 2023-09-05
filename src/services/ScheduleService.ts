@@ -1,5 +1,9 @@
 import { FindAllArgs, FindAllReturn, IService } from "../interfaces";
-import { ScheduleInputDTO, ScheduleOutputDTO } from "../models/dtos";
+import {
+  ScheduleInputDTO,
+  ScheduleOutputDTO,
+  SchedulesUpdateParamsDTO,
+} from "../models/dtos";
 import { ScheduleRepository } from "../models/repositories/barbershop";
 
 export class ScheduleService implements IService {
@@ -9,8 +13,13 @@ export class ScheduleService implements IService {
 
     return schedule;
   }
-  async update(id: string, data: unknown): Promise<unknown> {
-    throw new Error("Method not implemented.");
+  async update(
+    id: string,
+    data: SchedulesUpdateParamsDTO
+  ): Promise<ScheduleOutputDTO> {
+    const schedule = await this.scheduleRepository.update(id, data);
+
+    return schedule;
   }
   async changeStatus(id: string, status: string): Promise<unknown> {
     throw new Error("Method not implemented.");
