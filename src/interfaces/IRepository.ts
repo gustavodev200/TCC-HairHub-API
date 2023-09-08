@@ -1,10 +1,18 @@
-import { GenericStatus } from "../models/dtos";
+import { GenericStatus, ScheduleStatus } from "../models/dtos";
 
 export type FindAllArgs = {
   skip?: number;
   take?: number;
   searchTerm?: string;
   filterByStatus?: GenericStatus;
+  itemsToExclude?: string[];
+};
+
+export type FindAllArgsScheduling = {
+  skip?: number;
+  take?: number;
+  searchTerm?: string;
+  filterByStatus?: ScheduleStatus;
   itemsToExclude?: string[];
 };
 

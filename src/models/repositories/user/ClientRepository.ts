@@ -65,7 +65,8 @@ export class ClientRepository implements IRepository {
         data.role,
         address.toJSON(),
         data.email,
-        hashedPassword
+        hashedPassword,
+        data.image
       );
 
       client.validate();
@@ -79,6 +80,7 @@ export class ClientRepository implements IRepository {
           role: client.role,
           email: client.email,
           password: client.password,
+          id: client.id,
           address: {
             create: {
               cep: client.address.cep,
@@ -158,6 +160,7 @@ export class ClientRepository implements IRepository {
         address.toJSON(),
         clientToUpdate.email,
         clientToUpdate.password,
+        clientToUpdate.image as string,
         clientToUpdate.id,
         clientToUpdate.status as GenericStatus
       );

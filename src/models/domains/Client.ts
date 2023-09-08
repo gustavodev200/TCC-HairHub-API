@@ -19,6 +19,7 @@ export class Client extends User {
     _address: AddressInputDTO | AddressDTO,
     _email: string,
     _password: string,
+    _image?: string,
     _id?: string,
     _status?: GenericStatus
   ) {
@@ -31,6 +32,7 @@ export class Client extends User {
       _address,
       _email,
       _password,
+      _image,
       _id,
       _status
     );

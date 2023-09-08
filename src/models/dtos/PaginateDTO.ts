@@ -1,3 +1,4 @@
+import { ScheduleStatus } from "./ScheduleStatusDTO";
 import { GenericStatus } from "./Status";
 
 export interface PaginatedDataRequestDTO {
@@ -13,4 +14,12 @@ export interface PaginatedDataResponseDTO<T> {
   totalPages: number;
   query?: string;
   filterByStatus?: GenericStatus;
+}
+
+export interface PaginatedDataResponseScheduleDTO<T> {
+  data: T[];
+  page: number;
+  totalPages: number;
+  query?: string;
+  filterByStatus?: ScheduleStatus;
 }

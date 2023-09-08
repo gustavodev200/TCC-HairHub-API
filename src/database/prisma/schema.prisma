@@ -87,6 +87,7 @@ model AvailableDays {
 model Client {
     id         String         @id @default(uuid())
     name       String
+    image      String?
     cpf        String         @unique
     dataNasc   DateTime
     phone      String
