@@ -38,4 +38,10 @@ export class EmployeeService implements IService {
       password: generateRandomPassword(Number(process.env.PASSWORD_LENGTH)),
     });
   }
+
+  async listBarbers(): Promise<EmployeeOutputDTO[]> {
+    const result = await this.employeeService.listBarbers();
+
+    return result;
+  }
 }

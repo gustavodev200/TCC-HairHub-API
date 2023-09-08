@@ -128,10 +128,7 @@ export class ScheduleRepository implements IRepository {
     return "Barbeiro não disponivel";
   }
 
-  async update(
-    id: string,
-    data: SchedulesUpdateParamsDTO
-  ): Promise<ScheduleOutputDTO | string> {
+  async update(id: string, data: SchedulesUpdateParamsDTO) {
     try {
       const scheduleToUpdate = await prisma.scheduling.findUniqueOrThrow({
         where: { id },

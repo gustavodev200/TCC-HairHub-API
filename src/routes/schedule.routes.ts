@@ -2,6 +2,7 @@ import { Router } from "express";
 import CreateScheduleController from "../controllers/barbershop/schedules/CreateScheduleController";
 import UpdateScheduleController from "../controllers/barbershop/schedules/UpdateScheduleController";
 import ListScheduleController from "../controllers/barbershop/schedules/ListScheduleController";
+import ChangeScheduleController from "../controllers/barbershop/schedules/ChangeScheduleController";
 
 const scheduleRoutes = Router();
 
@@ -12,6 +13,6 @@ scheduleRoutes.put("/:id", UpdateScheduleController.handle);
 //list schedules
 scheduleRoutes.get("/", ListScheduleController.handle);
 //change schedules
-// scheduleRoutes.patch("/:id", ChangeProductController.handle);
+scheduleRoutes.patch("/:id", ChangeScheduleController.handle);
 
 export { scheduleRoutes };

@@ -11,6 +11,7 @@ import {
   EmployeeOutputDTO,
   GenericStatus,
   IUpdateEmployeeParams,
+  ScheduleStatus,
   ShiftInputDTO,
   ShiftOutputDTO,
 } from "../../dtos";
@@ -661,5 +662,36 @@ export class EmployeeRepository implements IRepository {
     } catch {
       throw new AppError(ErrorMessages.MSGE02, 404);
     }
+  }
+
+  public async listBarbers() {
+    const data = await prisma.employee.findMany({
+      where: {
+        role: AssignmentType.EMPLOYEE,
+        status: GenericStatus.active,
+      },
+
+      include: {
+        schedules: true,
+        shifts: {
+          orderBy: {
+            order: "asc",
+          },
+          include: {
+            available_days: {
+              orderBy: {
+                day: "asc",
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!data) {
+      throw new AppError(ErrorMessages.MSGE05, 404);
+    }
+
+    return data as unknown as EmployeeOutputDTO[];
   }
 }

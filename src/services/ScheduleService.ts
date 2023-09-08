@@ -6,6 +6,7 @@ import {
 import {
   ScheduleInputDTO,
   ScheduleOutputDTO,
+  ScheduleStatus,
   SchedulesUpdateParamsDTO,
 } from "../models/dtos";
 import { ScheduleRepository } from "../models/repositories/barbershop";
@@ -25,8 +26,15 @@ export class ScheduleService implements IServiceSchedule {
 
     return schedule;
   }
-  async changeStatus(id: string, status: string): Promise<unknown> {
-    throw new Error("Method not implemented.");
+  async changeStatus(
+    id: string,
+    schedule_status: ScheduleStatus
+  ): Promise<ScheduleOutputDTO | string> {
+    const updatedSchedule = await this.scheduleRepository.update(id, {
+      schedule_status,
+    });
+
+    return updatedSchedule;
   }
   async list(args?: FindAllArgsScheduling | undefined): Promise<FindAllReturn> {
     const result = await this.scheduleRepository.findAll(args);
