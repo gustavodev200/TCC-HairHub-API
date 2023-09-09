@@ -4,7 +4,7 @@ import { EmployeeService } from "../../../services/user";
 class ListOnlyBarbersController {
   public async handle(req: Request, res: Response) {
     const barbersService = new EmployeeService();
-    const result = await barbersService.list();
+    const result = await barbersService.listBarbers();
 
     return res.json(result);
   }

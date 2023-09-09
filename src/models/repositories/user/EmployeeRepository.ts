@@ -244,6 +244,7 @@ export class EmployeeRepository implements IRepository {
         where: { id },
         include: {
           address: true,
+          schedules: true,
           shifts: {
             include: {
               available_days: true,
@@ -268,6 +269,14 @@ export class EmployeeRepository implements IRepository {
       if (!employeeToUpdate) {
         throw new AppError(ErrorMessages.MSGE05, 404);
       }
+
+      if (
+        employeeToUpdate.schedules.length > 0 &&
+        data.status === GenericStatus.inactive
+      ) {
+        throw new AppError(ErrorMessages.MSGE04);
+      }
+
       const address = new Address(
         employeeToUpdate.address.cep,
         employeeToUpdate.address.city,
@@ -669,6 +678,9 @@ export class EmployeeRepository implements IRepository {
       where: {
         role: AssignmentType.EMPLOYEE,
         status: GenericStatus.active,
+        schedules: {
+          some: {},
+        },
       },
 
       include: {
@@ -692,6 +704,24 @@ export class EmployeeRepository implements IRepository {
       throw new AppError(ErrorMessages.MSGE05, 404);
     }
 
-    return data as unknown as EmployeeOutputDTO[];
+    const dataToUse = data.map((employee) => ({
+      ...excludeFields(employee, [
+        "created_at",
+        "updated_at",
+        "password",
+        "address_id",
+      ]),
+
+      shifts: employee.shifts.map((shift) => {
+        return {
+          ...shift,
+          available_days: shift.available_days.map(({ day }) => {
+            return day;
+          }),
+        };
+      }),
+    }));
+
+    return dataToUse as unknown as EmployeeOutputDTO[];
   }
 }

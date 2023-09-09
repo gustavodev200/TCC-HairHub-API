@@ -282,6 +282,7 @@ export class ScheduleRepository implements IRepository {
     const data = await prisma.scheduling.findMany({
       skip: args?.skip,
       take: args?.take,
+      // where,
       include: {
         employee: {
           select: {
@@ -296,7 +297,6 @@ export class ScheduleRepository implements IRepository {
         services: {
           select: {
             name: true,
-            price: true,
           },
         },
       },
