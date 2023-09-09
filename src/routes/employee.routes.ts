@@ -6,6 +6,7 @@ import UpdateEmployeeController from "../controllers/users/employee/UpdateEmploy
 import ResetEmployeePasswordController from "../controllers/users/employee/ResetEmployeePasswordController";
 import ChangeEmployeeStatusController from "../controllers/users/employee/ChangeEmployeeStatusController";
 import ListOnlyBarbersController from "../controllers/users/employee/ListOnlyBarbersController";
+import ListAllBarbersController from "../controllers/users/employee/ListAllBarbersController";
 
 const employeeRoutes = Router();
 
@@ -24,6 +25,8 @@ employeeRoutes.put(
 employeeRoutes.patch("/:id", ChangeEmployeeStatusController.handle);
 
 //list get employee
-employeeRoutes.get("/barbers", ListOnlyBarbersController.handle);
+employeeRoutes.get("/barbers-with-schedule", ListOnlyBarbersController.handle);
+
+employeeRoutes.get("/all-barbers", ListAllBarbersController.handle);
 
 export { employeeRoutes };

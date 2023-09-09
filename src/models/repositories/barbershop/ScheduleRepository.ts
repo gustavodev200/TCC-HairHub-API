@@ -310,6 +310,4 @@ export class ScheduleRepository implements IRepository {
       totalItems,
     };
   }
-
-  //criar um endpoint para lista apenas os barbeiros que tem agendamento /getFilter
 }

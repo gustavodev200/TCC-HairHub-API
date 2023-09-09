@@ -1,6 +1,7 @@
 import { prisma } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgs, IRepository } from "../../../interfaces/IRepository";
+import { excludeFields } from "../../../utils";
 import { Service } from "../../domains";
 import {
   GenericStatus,
@@ -121,8 +122,16 @@ export class ServiceRepository implements IRepository {
   }
 
   public async listServices() {
-    const data = await prisma.service.findMany();
+    const data = await prisma.service.findMany({
+      where: {
+        status: "active",
+      },
+    });
 
-    return data as IServiceOutputDTO[];
+    const dataToUse = data.map((employee) => ({
+      ...excludeFields(employee, ["created_at", "updated_at"]),
+    }));
+
+    return dataToUse as IServiceOutputDTO[];
   }
 }

@@ -38,4 +38,10 @@ export class ClientService implements IService {
       password: generateRandomPassword(Number(process.env.PASSWORD_LENGTH)),
     });
   }
+
+  async listAllClients(): Promise<ClientOutputDTO[]> {
+    const result = await this.clientService.listAllClients();
+
+    return result;
+  }
 }

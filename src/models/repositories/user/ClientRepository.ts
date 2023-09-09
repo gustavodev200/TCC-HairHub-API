@@ -335,4 +335,27 @@ export class ClientRepository implements IRepository {
       throw new AppError(ErrorMessages.MSGE02, 404);
     }
   }
+
+  public async listAllClients() {
+    const data = await prisma.client.findMany({
+      where: {
+        role: AssignmentType.CLIENT,
+        status: GenericStatus.active,
+      },
+    });
+    if (!data) {
+      throw new AppError(ErrorMessages.MSGE05, 404);
+    }
+
+    const dataToUse = data.map((employee) => ({
+      ...excludeFields(employee, [
+        "created_at",
+        "updated_at",
+        "password",
+        "address_id",
+      ]),
+    }));
+
+    return dataToUse as unknown as ClientOutputDTO[];
+  }
 }

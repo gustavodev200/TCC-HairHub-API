@@ -673,7 +673,7 @@ export class EmployeeRepository implements IRepository {
     }
   }
 
-  public async listBarbers() {
+  public async listBarbersWithSchedule() {
     const data = await prisma.employee.findMany({
       where: {
         role: AssignmentType.EMPLOYEE,
@@ -700,6 +700,53 @@ export class EmployeeRepository implements IRepository {
       },
     });
 
+    if (!data) {
+      throw new AppError(ErrorMessages.MSGE05, 404);
+    }
+
+    const dataToUse = data.map((employee) => ({
+      ...excludeFields(employee, [
+        "created_at",
+        "updated_at",
+        "password",
+        "address_id",
+      ]),
+
+      shifts: employee.shifts.map((shift) => {
+        return {
+          ...shift,
+          available_days: shift.available_days.map(({ day }) => {
+            return day;
+          }),
+        };
+      }),
+    }));
+
+    return dataToUse as unknown as EmployeeOutputDTO[];
+  }
+
+  public async listAllBarbers() {
+    const data = await prisma.employee.findMany({
+      where: {
+        role: AssignmentType.EMPLOYEE,
+        status: GenericStatus.active,
+      },
+      include: {
+        schedules: true,
+        shifts: {
+          orderBy: {
+            order: "asc",
+          },
+          include: {
+            available_days: {
+              orderBy: {
+                day: "asc",
+              },
+            },
+          },
+        },
+      },
+    });
     if (!data) {
       throw new AppError(ErrorMessages.MSGE05, 404);
     }

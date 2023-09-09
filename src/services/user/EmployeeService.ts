@@ -39,8 +39,14 @@ export class EmployeeService implements IService {
     });
   }
 
-  async listBarbers(): Promise<EmployeeOutputDTO[]> {
-    const result = await this.employeeService.listBarbers();
+  async listBarbersWithSchedule(): Promise<EmployeeOutputDTO[]> {
+    const result = await this.employeeService.listBarbersWithSchedule();
+
+    return result;
+  }
+
+  async listAllBarbers(): Promise<EmployeeOutputDTO[]> {
+    const result = await this.employeeService.listAllBarbers();
 
     return result;
   }
