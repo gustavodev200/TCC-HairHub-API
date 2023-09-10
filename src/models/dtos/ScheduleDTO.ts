@@ -17,7 +17,7 @@ export interface ScheduleInputDTO {
   end_date_time: string;
   services: string[];
   client: string;
-  employee: EmployeeOutputDTO;
+  employee: string;
 }
 
 export interface ScheduleOutputDTO extends ScheduleInputDTO {
