@@ -21,9 +21,9 @@ export class Employee extends User {
     _email: string,
     _password: string,
     _shifts?: ShiftInputDTO[],
+    _image?: string,
     _id?: string,
-    _status?: GenericStatus,
-    _image?: string
+    _status?: GenericStatus
   ) {
     super(
       _name,

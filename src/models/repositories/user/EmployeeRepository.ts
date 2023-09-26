@@ -115,7 +115,6 @@ export class EmployeeRepository implements IRepository {
 
       const employee = new Employee(
         data.name,
-
         data.cpf,
         data.dataNasc,
         data.phone,
@@ -123,8 +122,8 @@ export class EmployeeRepository implements IRepository {
         address.toJSON(),
         data.email,
         hashedPassword,
-        shifts
-        // data.image
+        shifts,
+        data.image
       );
 
       employee.validate();
@@ -445,6 +444,7 @@ export class EmployeeRepository implements IRepository {
           start_time: shift.start_time.toISOString(),
           end_time: shift.end_time.toISOString(),
         })),
+        employeeToUpdate.image as string,
         employeeToUpdate.id,
         employeeToUpdate.status as GenericStatus
       );
@@ -457,6 +457,7 @@ export class EmployeeRepository implements IRepository {
       if (data.email !== undefined) employee.email = data.email;
       if (data.password !== undefined) employee.password = data.password;
       if (data.status !== undefined) employee.status = data.status;
+      if (data.image !== undefined) employee.image = data.image;
       if (data.shifts !== undefined) employee.shifts = data.shifts;
 
       employee.validate();

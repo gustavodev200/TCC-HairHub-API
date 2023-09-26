@@ -23,6 +23,7 @@ enum ScheduleStatus {
     scheduled
     confirmed
     awaiting_service
+    attend
     finished
     canceled
 }

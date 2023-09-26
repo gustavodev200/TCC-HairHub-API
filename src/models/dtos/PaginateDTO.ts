@@ -22,4 +22,6 @@ export interface PaginatedDataResponseScheduleDTO<T> {
   totalPages: number;
   query?: string;
   filterByStatus?: ScheduleStatus;
+  filterByDate?: Date;
+  filterByEmployee?: string;
 }

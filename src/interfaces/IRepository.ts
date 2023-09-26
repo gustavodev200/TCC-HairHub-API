@@ -1,3 +1,4 @@
+import { Employee } from "../models/domains";
 import { GenericStatus, ScheduleStatus } from "../models/dtos";
 
 export type FindAllArgs = {
@@ -13,6 +14,8 @@ export type FindAllArgsScheduling = {
   take?: number;
   searchTerm?: string;
   filterByStatus?: ScheduleStatus;
+  filterByEmployee?: string;
+  filterByDate?: Date;
   itemsToExclude?: string[];
 };
 

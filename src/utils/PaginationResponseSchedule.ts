@@ -1,7 +1,6 @@
 import { Request } from "express";
 import { IServiceSchedule } from "../interfaces";
 import {
-  GenericStatus,
   PaginatedDataResponseScheduleDTO,
   ScheduleStatus,
 } from "../models/dtos";
@@ -23,22 +22,37 @@ export class PaginatedResponseSchedule<T> {
       throw new AppError("O tamanho da página deve ser um número");
     }
 
-    if (
-      typeof req.query.filterByStatus === "string" &&
-      !(req.query.filterByStatus in GenericStatus)
-    ) {
-      throw new AppError(`${req.query.filterByStatus} não é um status válido`);
-    }
-
     const pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
     const page = req.query.page ? Number(req.query.page) : 1;
     const skip = (page - 1) * pageSize;
 
+    const filters: {
+      searchTerm?: string;
+      filterByStatus?: ScheduleStatus;
+      filterByDate?: Date;
+      filterByEmployee?: string;
+    } = {};
+
+    if (req.query.query) {
+      filters.searchTerm = req.query.query as string;
+    }
+
+    if (req.query.filterByStatus) {
+      filters.filterByStatus = req.query.filterByStatus as ScheduleStatus;
+    }
+
+    if (req.query.filterByDate) {
+      filters.filterByDate = new Date(req.query.filterByDate as string);
+    }
+
+    if (req.query.filterByEmployee) {
+      filters.filterByEmployee = req.query.filterByEmployee as string;
+    }
+
     const { data, totalItems } = await this.service.list({
       skip,
       take: pageSize,
-      searchTerm: req.query.query as string,
-      filterByStatus: req.query.filterByStatus as ScheduleStatus,
+      ...filters,
     });
 
     const response: PaginatedDataResponseScheduleDTO<T> = {
@@ -47,6 +61,8 @@ export class PaginatedResponseSchedule<T> {
       totalPages: Math.ceil(totalItems / pageSize),
       query: req.query.query as string,
       filterByStatus: req.query.filterByStatus as ScheduleStatus,
+      filterByDate: req.query.filterByDate as unknown as Date,
+      filterByEmployee: req.query.filterByEmployee as string,
     };
 
     return response;

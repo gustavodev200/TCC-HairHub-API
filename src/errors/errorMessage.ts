@@ -18,6 +18,6 @@ export enum ErrorMessages {
   MSGE17 = "Credenciais inválidas",
   MSGE18 = "Acesso não autorizado",
   MSGE019 = "Não é possível criar um produto sem nenhuma categoria criada.",
-  MSGE020 = "Barbeiro não possui disponibilidade nessa data.",
-  MSGE021 = "Já existe um agendamento para o mesmo dia e horário",
+  MSGE020 = "Barbeiro não disponivel! Tente novamente em outro horário/dia.",
+  // MSGE021 = "Já existe um agendamento para o mesmo dia e horário",
 }

@@ -1,7 +1,6 @@
 import { prisma } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgsScheduling, IRepository } from "../../../interfaces";
-import { excludeFields } from "../../../utils";
 import { Schedule } from "../../domains";
 import {
   ScheduleInputDTO,
@@ -86,7 +85,7 @@ export class ScheduleRepository implements IRepository {
       });
 
       if (timeScheduled.length) {
-        return "Barbeiro não disponivel";
+        throw new AppError(ErrorMessages.MSGE020);
       }
 
       const schedule = new Schedule(
@@ -125,7 +124,7 @@ export class ScheduleRepository implements IRepository {
       return scheduleCreated as unknown as ScheduleOutputDTO;
     }
 
-    return "Barbeiro não disponivel";
+    throw new AppError(ErrorMessages.MSGE020);
   }
 
   async update(id: string, data: SchedulesUpdateParamsDTO) {
@@ -206,7 +205,7 @@ export class ScheduleRepository implements IRepository {
         });
 
         if (newTimeScheduled.length) {
-          throw new AppError("Barbeiro não disponivel");
+          throw new AppError(ErrorMessages.MSGE020);
         }
 
         const schedule = new Schedule(
@@ -253,7 +252,7 @@ export class ScheduleRepository implements IRepository {
         return updatedSchedule as unknown as ScheduleOutputDTO;
       }
 
-      return "Barbeiro não disponivel";
+      throw new AppError(ErrorMessages.MSGE020);
     } catch (error) {
       if (error instanceof AppError || error instanceof Error) throw error;
 
@@ -263,26 +262,26 @@ export class ScheduleRepository implements IRepository {
 
   public async findAll(args?: FindAllArgsScheduling) {
     const where = {
-      OR: args?.searchTerm
-        ? [
-            {
-              name: {
-                contains: args?.searchTerm,
-              },
-            },
-          ]
-        : undefined,
-      status: {
-        equals: args?.filterByStatus,
-      },
+      // OR: args?.searchTerm
+      //   ? [
+      //       {
+      //         name: {
+      //           contains: args?.searchTerm,
+      //         },
+      //       },
+      //     ]
+      //   : undefined,
+      // status: {
+      //   equals: args?.filterByStatus,
+      // },
     };
 
-    const totalItems = await prisma.scheduling.count();
+    const totalItems = await prisma.scheduling.count({ where });
 
     const data = await prisma.scheduling.findMany({
       skip: args?.skip,
       take: args?.take,
-      // where,
+      where,
       include: {
         employee: {
           select: {

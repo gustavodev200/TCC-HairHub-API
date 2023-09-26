@@ -10,7 +10,7 @@ import { scheduleRoutes } from "./schedule.routes";
 
 const routes = Router();
 
-routes.use("/employees", authenticationHandler, employeeRoutes);
+routes.use("/employees", employeeRoutes);
 routes.use("/clients", authenticationHandler, clientRoutes);
 routes.use("/categories", authenticationHandler, categoryRoutes);
 routes.use("/products", authenticationHandler, productRoutes);
