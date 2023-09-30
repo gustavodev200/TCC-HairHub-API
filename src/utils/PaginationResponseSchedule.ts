@@ -29,7 +29,7 @@ export class PaginatedResponseSchedule<T> {
     const filters: {
       searchTerm?: string;
       filterByStatus?: ScheduleStatus;
-      filterByDate?: Date;
+      filterByDate?: string;
       filterByEmployee?: string;
     } = {};
 
@@ -42,7 +42,7 @@ export class PaginatedResponseSchedule<T> {
     }
 
     if (req.query.filterByDate) {
-      filters.filterByDate = new Date(req.query.filterByDate as string);
+      filters.filterByDate = req.query.filterByDate as string;
     }
 
     if (req.query.filterByEmployee) {
@@ -53,6 +53,7 @@ export class PaginatedResponseSchedule<T> {
       skip,
       take: pageSize,
       ...filters,
+      itemsToExclude: [req.user.id],
     });
 
     const response: PaginatedDataResponseScheduleDTO<T> = {
@@ -61,7 +62,7 @@ export class PaginatedResponseSchedule<T> {
       totalPages: Math.ceil(totalItems / pageSize),
       query: req.query.query as string,
       filterByStatus: req.query.filterByStatus as ScheduleStatus,
-      filterByDate: req.query.filterByDate as unknown as Date,
+      filterByDate: req.query.filterByDate as string,
       filterByEmployee: req.query.filterByEmployee as string,
     };
 

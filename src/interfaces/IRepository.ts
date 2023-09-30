@@ -15,7 +15,7 @@ export type FindAllArgsScheduling = {
   searchTerm?: string;
   filterByStatus?: ScheduleStatus;
   filterByEmployee?: string;
-  filterByDate?: Date;
+  filterByDate?: string;
   itemsToExclude?: string[];
 };
 

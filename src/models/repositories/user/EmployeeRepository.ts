@@ -573,6 +573,9 @@ export class EmployeeRepository implements IRepository {
 
   async findAll(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
     const where = {
+      NOT: args?.itemsToExclude
+        ? { id: { in: args?.itemsToExclude } }
+        : undefined,
       OR: args?.searchTerm
         ? [
             {

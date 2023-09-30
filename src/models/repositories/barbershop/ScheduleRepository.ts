@@ -262,18 +262,20 @@ export class ScheduleRepository implements IRepository {
 
   public async findAll(args?: FindAllArgsScheduling) {
     const where = {
-      // OR: args?.searchTerm
-      //   ? [
-      //       {
-      //         name: {
-      //           contains: args?.searchTerm,
-      //         },
-      //       },
-      //     ]
-      //   : undefined,
-      // status: {
-      //   equals: args?.filterByStatus,
-      // },
+      start_date_time: args?.filterByDate
+        ? {
+            gte: dayjs(args?.filterByDate).startOf("day").toISOString(),
+            lte: dayjs(args?.filterByDate).endOf("day").toISOString(),
+          }
+        : undefined,
+
+      employee_id: {
+        equals: args?.filterByEmployee,
+      },
+
+      schedule_status: {
+        equals: args?.filterByStatus,
+      },
     };
 
     const totalItems = await prisma.scheduling.count({ where });
