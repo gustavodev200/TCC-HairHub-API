@@ -5,6 +5,7 @@ import UpdateClientController from "../controllers/users/client/UpdateClientCont
 import ListClientController from "../controllers/users/client/ListClientController";
 import ResetClientPasswordController from "../controllers/users/client/ResetClientPasswordController";
 import ListAllClientsController from "../controllers/users/client/ListAllClientsController";
+import GetClientByIdController from "../controllers/users/client/GetClientByIdController";
 
 const clientRoutes = Router();
 
@@ -20,5 +21,7 @@ clientRoutes.get("/", ListClientController.handle);
 clientRoutes.put("/:id/reset-password", ResetClientPasswordController.handle);
 
 clientRoutes.get("/all", ListAllClientsController.handle);
+
+clientRoutes.get("/:id", GetClientByIdController.handle);
 
 export { clientRoutes };

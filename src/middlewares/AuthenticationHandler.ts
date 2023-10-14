@@ -1,8 +1,11 @@
 import { verify } from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 import { AppError, ErrorMessages } from "../errors";
-import { AssignmentType, GenericStatus } from "../models/dtos";
-import { EmployeeRepository } from "../models/repositories/user";
+import { AssignmentType, ClientOutputDTO, GenericStatus } from "../models/dtos";
+import {
+  ClientRepository,
+  EmployeeRepository,
+} from "../models/repositories/user";
 
 interface Payload {
   sub: string;
@@ -27,17 +30,27 @@ export async function authenticationHandler(
       process.env.JWT_SECRET as string
     ) as Payload;
 
+    const clientRepository = new ClientRepository();
     const employeeRepository = new EmployeeRepository();
 
-    const employee = await employeeRepository.findById(id);
+    let user: any = await clientRepository.findById(id);
 
-    if (employee.status === GenericStatus.inactive) {
+    if (!user) {
+      user = await employeeRepository.findById(id);
+
+      if (!user || user.status === GenericStatus.inactive) {
+        throw new AppError(ErrorMessages.MSGE18, 401);
+      }
+    }
+
+    if (!user || user.status === GenericStatus.inactive) {
       throw new AppError(ErrorMessages.MSGE18, 401);
     }
 
     req.user = {
       id,
-      role: employee.role as AssignmentType,
+      name: user.name,
+      role: user.role as AssignmentType,
     };
 
     next();

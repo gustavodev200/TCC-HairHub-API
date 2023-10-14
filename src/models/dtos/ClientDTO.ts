@@ -8,7 +8,6 @@ export interface ClientInputDTO
     "id" | "status" | "created_at" | "updated_at" | "adress_id"
   > {}
 
-// Client Output DTO
 export interface ClientOutputDTO {
   id: string;
   name: string;

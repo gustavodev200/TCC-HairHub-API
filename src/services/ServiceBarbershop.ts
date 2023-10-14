@@ -38,6 +38,6 @@ export class ServiceBarbershop implements IService {
   public async listServices(): Promise<IServiceOutputDTO[]> {
     const service = await this.serviceRepository.listServices();
 
-    return service;
+    return service as unknown as IServiceOutputDTO[];
   }
 }

@@ -7,6 +7,7 @@ import ResetEmployeePasswordController from "../controllers/users/employee/Reset
 import ChangeEmployeeStatusController from "../controllers/users/employee/ChangeEmployeeStatusController";
 import ListOnlyBarbersController from "../controllers/users/employee/ListOnlyBarbersController";
 import ListAllBarbersController from "../controllers/users/employee/ListAllBarbersController";
+import { authenticatedManager } from "../middlewares/authenticatedManager";
 
 const employeeRoutes = Router();
 

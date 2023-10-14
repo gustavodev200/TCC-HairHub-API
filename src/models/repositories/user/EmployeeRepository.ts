@@ -14,6 +14,7 @@ import {
   ScheduleStatus,
   ShiftInputDTO,
   ShiftOutputDTO,
+  UserAuth,
 } from "../../dtos";
 import { hash } from "bcrypt";
 import { newPasswordEmailTemplate } from "../../../utils/firstAccessPassword";
@@ -650,18 +651,21 @@ export class EmployeeRepository implements IRepository {
     };
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<UserAuth | null> {
     try {
       const employee = await prisma.employee.findUniqueOrThrow({
         where: { email },
-        include: {
-          address: true,
-        },
       });
 
-      return { ...employee };
+      return {
+        id: employee.id,
+        email: employee.email,
+        name: employee.name,
+        role: employee.role as AssignmentType,
+        password: employee.password,
+      };
     } catch {
-      throw new AppError(ErrorMessages.MSGE02);
+      return null;
     }
   }
 
@@ -673,7 +677,7 @@ export class EmployeeRepository implements IRepository {
 
       return { ...employee, role: employee.role };
     } catch {
-      throw new AppError(ErrorMessages.MSGE02, 404);
+      return null;
     }
   }
 

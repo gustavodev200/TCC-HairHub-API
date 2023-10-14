@@ -29,15 +29,17 @@ enum ScheduleStatus {
 }
 
 model Service {
-    id         String       @id @default(uuid())
-    name       String       @unique
-    image      String?
-    time       Int
-    price      Float
-    status     Status       @default(active)
-    created_at DateTime     @default(now())
-    updated_at DateTime     @updatedAt
-    schedules  Scheduling[]
+    id             String        @id @default(uuid())
+    name           String        @unique
+    image          String?
+    time           Int
+    price          Float
+    status         Status        @default(active)
+    schedules      Scheduling[]
+    consumption_id String?
+    consumption    Consumption[]
+    created_at     DateTime      @default(now())
+    updated_at     DateTime      @updatedAt
 
     @@map("services")
 }
@@ -131,18 +133,32 @@ model Category {
 }
 
 model Product {
-    id          String    @id @default(uuid())
-    name        String    @unique
+    id          String        @id @default(uuid())
+    name        String        @unique
     price       Float
-    description String    @db.VarChar(500)
+    description String        @db.VarChar(500)
     amount      Int
-    status      Status    @default(active)
-    created_at  DateTime  @default(now())
-    updated_at  DateTime  @updatedAt
-    Category    Category? @relation(fields: [category_id], references: [id])
+    status      Status        @default(active)
+    Category    Category?     @relation(fields: [category_id], references: [id])
     category_id String?
+    consumption Consumption[]
+    created_at  DateTime      @default(now())
+    updated_at  DateTime      @updatedAt
 
     @@map("products")
+}
+
+model Consumption {
+    id                   String    @id @default(uuid())
+    payment_type         String
+    total_amount         Float
+    services_consumption Service?  @relation(fields: [service_id], references: [id])
+    products_consumption Product[]
+    service_id           String?
+    created_at           DateTime  @default(now())
+    updated_at           DateTime  @updatedAt
+
+    @@map("consumptions")
 }
 
 model Scheduling {

@@ -7,15 +7,15 @@ export async function authenticatedManager(
   res: Response,
   next: NextFunction
 ) {
-  const { role } = req.body.user;
+  const { role } = req.user;
 
   if (
-    role === AssignmentType.ADMIN ||
-    role === AssignmentType.EMPLOYEE ||
-    role === AssignmentType.CLIENT ||
-    role === AssignmentType.ATTENDANT
+    role !== AssignmentType.ADMIN &&
+    role !== AssignmentType.EMPLOYEE &&
+    role !== AssignmentType.CLIENT &&
+    role !== AssignmentType.ATTENDANT
   ) {
-    throw new AppError(ErrorMessages.MSGE18, 401);
+    throw new AppError(ErrorMessages.MSGE18, 403);
   }
 
   next();

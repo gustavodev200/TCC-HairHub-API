@@ -260,6 +260,21 @@ export class ScheduleRepository implements IRepository {
     }
   }
 
+  public async findById(id: string) {
+    try {
+      const schedule = await prisma.scheduling.findUniqueOrThrow({
+        where: { id },
+        include: {
+          services: true,
+        },
+      });
+
+      return schedule as unknown as ScheduleOutputDTO;
+    } catch (error) {
+      if (error instanceof AppError || error instanceof Error) throw error;
+    }
+  }
+
   public async findAll(args?: FindAllArgsScheduling) {
     const where = {
       start_date_time: args?.filterByDate

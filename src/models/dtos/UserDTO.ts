@@ -9,6 +9,14 @@ export enum AssignmentType {
   ATTENDANT = "attendant",
 }
 
+export interface UserAuth {
+  id: string;
+  email: string;
+  name: string;
+  password: string;
+  role: AssignmentType;
+}
+
 //All users interface
 export interface UserInterface {
   id?: string;

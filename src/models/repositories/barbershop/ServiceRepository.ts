@@ -132,6 +132,6 @@ export class ServiceRepository implements IRepository {
       ...excludeFields(employee, ["created_at", "updated_at"]),
     }));
 
-    return dataToUse as IServiceOutputDTO[];
+    return dataToUse;
   }
 }

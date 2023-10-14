@@ -2,6 +2,7 @@ import { FindAllArgs, FindAllReturn, IService } from "../interfaces";
 import { GenericStatus } from "../models/dtos";
 import {
   ProductInputDTO,
+  ProductOutputDTO,
   UpdateParamsProductDTO,
 } from "../models/dtos/ProductDTO";
 import { ProductRepository } from "../models/repositories/barbershop";
@@ -27,7 +28,9 @@ export class ProductService implements IService {
     return changeProductStatus;
   }
 
-  list(args?: FindAllArgs | undefined): Promise<FindAllReturn> {
-    throw new Error("Method not implemented.");
+  async listOnlyProducts() {
+    const data = await this.productRepository.listOnlyProducts();
+
+    return data as ProductOutputDTO[];
   }
 }

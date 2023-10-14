@@ -2,6 +2,7 @@ import { FindAllArgs, FindAllReturn, IService } from "../../interfaces";
 import {
   ClientInputDTO,
   ClientOutputDTO,
+  EmployeeOutputDTO,
   GenericStatus,
   IUpdateClientParams,
 } from "../../models/dtos";
@@ -43,5 +44,11 @@ export class ClientService implements IService {
     const result = await this.clientService.listAllClients();
 
     return result;
+  }
+
+  async getClientById(id: string): Promise<ClientOutputDTO> {
+    const result = await this.clientService.findById(id);
+
+    return result as unknown as ClientOutputDTO;
   }
 }

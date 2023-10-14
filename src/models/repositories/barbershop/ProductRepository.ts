@@ -1,6 +1,7 @@
 import { prisma } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgs, FindAllReturn, IRepository } from "../../../interfaces";
+import { excludeFields } from "../../../utils";
 import { Product } from "../../domains";
 import { GenericStatus } from "../../dtos";
 import {
@@ -103,5 +104,19 @@ export class ProductRepository implements IRepository {
     });
 
     return updateProduct as ProductOutputDTO;
+  }
+
+  public async listOnlyProducts() {
+    const data = await prisma.product.findMany({
+      where: {
+        status: "active",
+      },
+    });
+
+    const dataToUse = data.map((product) => ({
+      ...excludeFields(product, ["created_at", "updated_at"]),
+    }));
+
+    return dataToUse as ProductOutputDTO[];
   }
 }

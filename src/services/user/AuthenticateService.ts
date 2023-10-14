@@ -1,36 +1,46 @@
 import { compare } from "bcrypt";
 import { AppError, ErrorMessages } from "../../errors";
-import { prisma } from "../../models";
-import { UserInterface } from "../../models/dtos";
-import { sign } from "jsonwebtoken";
+import { decode, sign } from "jsonwebtoken";
+import {
+  EmployeeRepository,
+  ClientRepository,
+} from "../../models/repositories/user";
 
-export interface TokenInterface {
-  token: string;
-}
+export class AuthenticationService {
+  private employeeRepository = new EmployeeRepository();
+  private clientRepository = new ClientRepository();
 
-export class AuthenticateService {
-  async execute({ email, password }: UserInterface): Promise<TokenInterface> {
-    const employee = await prisma.employee.findUnique({
-      where: {
-        email,
+  async execute(email: string, password: string) {
+    let user = await this.clientRepository.findByEmail(email);
+
+    if (!user) {
+      user = await this.employeeRepository.findByEmail(email);
+
+      if (!user) {
+        throw new AppError(ErrorMessages.MSGE15);
+      }
+    }
+
+    const isValidPassword = await compare(password, user.password);
+
+    if (!isValidPassword) {
+      throw new AppError(ErrorMessages.MSGE15);
+    }
+
+    const token = sign(
+      {
+        email: user.email,
+        role: user.role,
+        name: user.name,
       },
-    });
+      `${process.env.JWT_SECRET}`,
+      {
+        subject: user.id,
 
-    if (!employee) {
-      throw new AppError(ErrorMessages.MSGE15);
-    }
+        expiresIn: "60d",
+      }
+    );
 
-    const verifyPassword = await compare(password, employee.password);
-
-    if (!verifyPassword) {
-      throw new AppError(ErrorMessages.MSGE15);
-    }
-
-    const token = sign({ id: employee.id }, `${process.env.JWT_SECRET}`, {
-      subject: employee.id,
-      expiresIn: "30d",
-    });
-
-    return { token };
+    return token;
   }
 }

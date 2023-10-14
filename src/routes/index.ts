@@ -7,15 +7,58 @@ import { categoryRoutes } from "./category.routes";
 import { productRoutes } from "./product.routes";
 import { clientRoutes } from "./client.routes";
 import { scheduleRoutes } from "./schedule.routes";
+import { consumptionRoutes } from "./consumption.routes";
+import { authenticatedAdmin } from "../middlewares/authenticatedAdmin";
+import { authenticatedManager } from "../middlewares/authenticatedManager";
 
 const routes = Router();
 
-routes.use("/employees", authenticationHandler, employeeRoutes);
-routes.use("/clients", authenticationHandler, clientRoutes);
-routes.use("/categories", authenticationHandler, categoryRoutes);
-routes.use("/products", authenticationHandler, productRoutes);
-routes.use("/services", authenticationHandler, serviceRoutes);
-routes.use("/schedulings", authenticationHandler, scheduleRoutes);
+routes.use(
+  "/employees",
+  authenticationHandler,
+  authenticatedManager,
+  // authenticatedAdmin,
+  employeeRoutes
+);
+
+routes.use(
+  "/categories",
+  authenticationHandler,
+  authenticatedAdmin,
+  categoryRoutes
+);
+routes.use(
+  "/products",
+  authenticationHandler,
+  authenticatedAdmin,
+  productRoutes
+);
+routes.use(
+  "/services",
+  authenticationHandler,
+  authenticatedManager,
+  serviceRoutes
+);
+
+routes.use(
+  "/clients",
+  authenticationHandler,
+  authenticatedManager,
+  clientRoutes
+);
+
+routes.use(
+  "/consumptions",
+  authenticationHandler,
+  authenticatedManager,
+  consumptionRoutes
+);
+routes.use(
+  "/schedulings",
+  authenticationHandler,
+  authenticatedManager,
+  scheduleRoutes
+);
 routes.use("/auth", authRoutes);
 
 export { routes };

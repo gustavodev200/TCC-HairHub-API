@@ -9,8 +9,10 @@ import {
   AssignmentType,
   ClientInputDTO,
   ClientOutputDTO,
+  EmployeeOutputDTO,
   GenericStatus,
   IUpdateClientParams,
+  UserAuth,
 } from "../../dtos";
 import { hash } from "bcrypt";
 import { newPasswordEmailTemplate } from "../../../utils/firstAccessPassword";
@@ -309,30 +311,36 @@ export class ClientRepository implements IRepository {
     };
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<UserAuth | null> {
     try {
       const client = await prisma.client.findUniqueOrThrow({
         where: { email },
-        include: {
-          address: true,
-        },
       });
 
-      return { ...client };
+      return {
+        id: client.id,
+        email: client.email,
+        name: client.name,
+        role: client.role as AssignmentType,
+        password: client.password,
+      };
     } catch {
-      throw new AppError(ErrorMessages.MSGE02);
+      return null;
     }
   }
 
   async findById(id: string) {
     try {
-      const client = await prisma.client.findUniqueOrThrow({
+      const client = await prisma.client.findUnique({
         where: { id },
+        include: {
+          scheduling: true,
+        },
       });
 
-      return { ...client, role: client.role };
+      return client as unknown as ClientOutputDTO;
     } catch {
-      throw new AppError(ErrorMessages.MSGE02, 404);
+      return null;
     }
   }
 

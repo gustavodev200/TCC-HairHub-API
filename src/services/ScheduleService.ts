@@ -40,4 +40,9 @@ export class ScheduleService implements IServiceSchedule {
     const result = await this.scheduleRepository.findAll(args);
     return result;
   }
+
+  async listById(id: string): Promise<ScheduleOutputDTO | string> {
+    const result = await this.scheduleRepository.findById(id);
+    return result;
+  }
 }
