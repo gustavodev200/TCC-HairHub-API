@@ -1,4 +1,5 @@
 import { AddressDTO } from "./AddressDTO";
+import { ScheduleOutputDTO } from "./ScheduleDTO";
 import { GenericStatus } from "./Status";
 import { AddressOutputDTO, AssignmentType } from "./UserDTO";
 
@@ -19,6 +20,7 @@ export interface ClientOutputDTO {
   status: GenericStatus;
   role: AssignmentType;
   address: AddressOutputDTO;
+  scheduling: ScheduleOutputDTO[];
   adress_id: string;
   created_at: Date;
   updated_at: Date;

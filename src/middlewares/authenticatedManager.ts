@@ -15,7 +15,7 @@ export async function authenticatedManager(
     role !== AssignmentType.CLIENT &&
     role !== AssignmentType.ATTENDANT
   ) {
-    throw new AppError(ErrorMessages.MSGE18, 403);
+    throw new AppError(ErrorMessages.MSGE18, 401);
   }
 
   next();

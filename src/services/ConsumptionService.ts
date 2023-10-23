@@ -21,7 +21,9 @@ export class ConsumptionService implements IService {
   async list(args?: any): Promise<any> {
     throw new Error("Method not implemented.");
   }
-  async listOnlyProducts(): Promise<any> {
-    throw new Error("Method not implemented.");
+  async listAllConsumptions(): Promise<ConsumptionOutputDTO[]> {
+    const data = await this.consumptionRepository.listAllConsumptions();
+
+    return data;
   }
 }

@@ -99,7 +99,6 @@ export class ScheduleRepository implements IRepository {
       if (start_date_time !== undefined)
         schedule.start_date_time = start_date_time;
       if (end_date_time !== undefined) schedule.end_date_time = end_date_time;
-      if (client !== undefined) schedule.client = client;
 
       schedule.validate();
 
@@ -118,6 +117,8 @@ export class ScheduleRepository implements IRepository {
         },
         include: {
           services: true,
+          employee: true,
+          client: true,
         },
       });
 
@@ -218,8 +219,6 @@ export class ScheduleRepository implements IRepository {
           scheduleToUpdate.id
         );
 
-        if (data.client !== undefined) schedule.client = data.client;
-        if (data.employee !== undefined) schedule.employee = data.employee;
         if (data.end_date_time !== undefined)
           schedule.end_date_time = data.end_date_time;
         if (data.start_date_time !== undefined)
@@ -243,9 +242,27 @@ export class ScheduleRepository implements IRepository {
                 id: service,
               })),
             },
+            confirmed_status_date_time:
+              data.schedule_status === "confirmed"
+                ? new Date().toISOString()
+                : undefined,
+            awaiting_status_date_time:
+              data.schedule_status === "awaiting_service"
+                ? new Date().toISOString()
+                : undefined,
+            attend_status_date_time:
+              data.schedule_status === "attend"
+                ? new Date().toISOString()
+                : undefined,
+            finished_status_date_time:
+              data.schedule_status === "finished"
+                ? new Date().toISOString()
+                : undefined,
           },
           include: {
             services: true,
+            employee: true,
+            client: true,
           },
         });
 
@@ -316,6 +333,7 @@ export class ScheduleRepository implements IRepository {
           select: {
             id: true,
             name: true,
+            price: true,
           },
         },
       },

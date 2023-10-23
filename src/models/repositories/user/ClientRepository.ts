@@ -334,7 +334,23 @@ export class ClientRepository implements IRepository {
       const client = await prisma.client.findUnique({
         where: { id },
         include: {
-          scheduling: true,
+          scheduling: {
+            include: {
+              services: true,
+              employee: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              client: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
         },
       });
 

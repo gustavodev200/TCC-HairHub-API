@@ -8,7 +8,6 @@ export async function authenticatedAdmin(
   next: NextFunction
 ) {
   const { role } = req.user;
-  console.log(role);
 
   if (role !== AssignmentType.ADMIN) {
     throw new AppError(ErrorMessages.MSGE18, 401);

@@ -1,6 +1,7 @@
 import { prisma } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { IRepository } from "../../../interfaces";
+import { excludeFields } from "../../../utils";
 import { Consumption } from "../../domains/Consumption";
 import {
   ConsumptionInputDTO,
@@ -10,15 +11,15 @@ import {
 export class ConsumptionRepository implements IRepository {
   async create({
     products_consumption,
+    services_consumption,
     total_amount,
     payment_type,
   }: ConsumptionInputDTO): Promise<ConsumptionOutputDTO> {
-    const existingConsumption = await prisma.consumption.findMany();
-
     const consumption = new Consumption(
       total_amount as number,
       payment_type,
-      products_consumption
+      products_consumption,
+      services_consumption
     );
 
     consumption.validate();
@@ -28,13 +29,23 @@ export class ConsumptionRepository implements IRepository {
         total_amount: Number(consumption.total_amount),
         payment_type: consumption.payment_type,
         products_consumption: {
-          connect: products_consumption.map((product) => ({
-            id: product,
+          create: consumption.products_consumption,
+        },
+        services_consumption: {
+          connect: consumption.services_consumption?.map((serviceId) => ({
+            id: serviceId,
           })),
         },
       },
       include: {
         products_consumption: true,
+        services_consumption: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+          },
+        },
       },
     });
 
@@ -49,7 +60,24 @@ export class ConsumptionRepository implements IRepository {
   async list(args?: any): Promise<any> {
     throw new Error("Method not implemented.");
   }
-  async listOnlyProducts(): Promise<any> {
-    throw new Error("Method not implemented.");
+  public async listAllConsumptions() {
+    const data = await prisma.consumption.findMany({
+      include: {
+        products_consumption: true,
+        services_consumption: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+          },
+        },
+      },
+    });
+
+    const dataToUse = data.map((consumption) => ({
+      ...excludeFields(consumption, ["created_at", "updated_at"]),
+    }));
+
+    return dataToUse as unknown as ConsumptionOutputDTO[];
   }
 }

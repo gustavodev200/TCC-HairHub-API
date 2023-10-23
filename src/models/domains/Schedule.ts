@@ -10,7 +10,11 @@ export class Schedule {
     private _client: string,
     private _employee: string,
     private _schedule_status?: ScheduleStatus,
-    private _id?: string
+    private _id?: string,
+    private _confirmed_status_date_time?: Date,
+    private _awaiting_status_date_time?: Date,
+    private _attend_status_date_time?: Date,
+    private _finished_status_date_time?: Date
   ) {}
 
   get id() {
@@ -41,6 +45,22 @@ export class Schedule {
     return this._employee;
   }
 
+  get confirmed_status_date_time() {
+    return this._confirmed_status_date_time as Date;
+  }
+
+  get awaiting_status_date_time() {
+    return this._awaiting_status_date_time as Date;
+  }
+
+  get attend_status_date_time() {
+    return this._attend_status_date_time as Date;
+  }
+
+  get finished_status_date_time() {
+    return this._finished_status_date_time as Date;
+  }
+
   set id(id: string) {
     this._id = id;
   }
@@ -69,6 +89,22 @@ export class Schedule {
     this._employee = employee;
   }
 
+  set confirmed_status_date_time(confirmed_status_date_time: Date) {
+    this._confirmed_status_date_time = confirmed_status_date_time;
+  }
+
+  set awaiting_status_date_time(awaiting_status_date_time: Date) {
+    this._awaiting_status_date_time = awaiting_status_date_time;
+  }
+
+  set attend_status_date_time(attend_status_date_time: Date) {
+    this._attend_status_date_time = attend_status_date_time;
+  }
+
+  set finished_status_date_time(finished_status_date_time: Date) {
+    this._finished_status_date_time = finished_status_date_time;
+  }
+
   toJSON() {
     return {
       id: this.id,
@@ -78,6 +114,10 @@ export class Schedule {
       client: this.client,
       employee: this.employee,
       schedule_status: this.schedule_status,
+      confirmed_status_date_time: this.confirmed_status_date_time,
+      awaiting_status_date_time: this.awaiting_status_date_time,
+      attend_status_date_time: this.attend_status_date_time,
+      finished_status_date_time: this.finished_status_date_time,
     };
   }
 

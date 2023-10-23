@@ -1,14 +1,13 @@
 import { z } from "zod";
-import { IServiceOutputDTO } from "../dtos";
-import { ProductOutputDTO } from "../dtos/ProductDTO";
-import { AppError, ErrorMessages } from "../../errors";
+import { AppError } from "../../errors";
+import { ConsumptionProductsConsumptionDTO } from "../dtos/ConsumptionDTO";
 
 export class Consumption {
   constructor(
     private _total_amount: number,
     private _payment_type: string,
-    private _products_consumption: string[],
-    private _services_consumption?: string[],
+    private _products_consumption: ConsumptionProductsConsumptionDTO[],
+    private _services_consumption: string[],
     private _id?: string
   ) {}
 
@@ -44,7 +43,9 @@ export class Consumption {
     this._payment_type = payment_type;
   }
 
-  set products_consumption(products_consumption: string[]) {
+  set products_consumption(
+    products_consumption: ConsumptionProductsConsumptionDTO[]
+  ) {
     this._products_consumption = products_consumption;
   }
 

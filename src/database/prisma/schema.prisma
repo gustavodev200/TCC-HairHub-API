@@ -133,44 +133,59 @@ model Category {
 }
 
 model Product {
-    id          String        @id @default(uuid())
-    name        String        @unique
+    id          String    @id @default(uuid())
+    name        String    @unique
     price       Float
-    description String        @db.VarChar(500)
+    description String    @db.VarChar(500)
     amount      Int
-    status      Status        @default(active)
-    Category    Category?     @relation(fields: [category_id], references: [id])
+    status      Status    @default(active)
+    Category    Category? @relation(fields: [category_id], references: [id])
     category_id String?
-    consumption Consumption[]
-    created_at  DateTime      @default(now())
-    updated_at  DateTime      @updatedAt
+    created_at  DateTime  @default(now())
+    updated_at  DateTime  @updatedAt
 
     @@map("products")
 }
 
 model Consumption {
-    id                   String    @id @default(uuid())
+    id                   String               @id @default(uuid())
     payment_type         String
     total_amount         Float
-    services_consumption Service?  @relation(fields: [service_id], references: [id])
-    products_consumption Product[]
-    service_id           String?
-    created_at           DateTime  @default(now())
-    updated_at           DateTime  @updatedAt
+    services_consumption Service[]
+    products_consumption ProductConsumption[]
+    created_at           DateTime             @default(now())
+    updated_at           DateTime             @updatedAt
 
     @@map("consumptions")
 }
 
+model ProductConsumption {
+    id             String      @id @default(uuid())
+    name           String
+    quantity       Int
+    price          Float
+    consumption    Consumption @relation(fields: [consumption_id], references: [id])
+    consumption_id String
+    created_at     DateTime    @default(now())
+    updated_at     DateTime    @updatedAt
+
+    @@map("products_consumption")
+}
+
 model Scheduling {
-    id              String         @id @default(uuid())
-    client          Client         @relation(fields: [client_id], references: [id])
-    employee        Employee       @relation(fields: [employee_id], references: [id])
-    services        Service[]
-    start_date_time DateTime
-    end_date_time   DateTime
-    schedule_status ScheduleStatus @default(scheduled)
-    client_id       String
-    employee_id     String
+    id                         String         @id @default(uuid())
+    client                     Client         @relation(fields: [client_id], references: [id])
+    employee                   Employee       @relation(fields: [employee_id], references: [id])
+    services                   Service[]
+    start_date_time            DateTime
+    end_date_time              DateTime
+    schedule_status            ScheduleStatus @default(scheduled)
+    client_id                  String
+    employee_id                String
+    confirmed_status_date_time DateTime?
+    awaiting_status_date_time  DateTime?
+    attend_status_date_time    DateTime?
+    finished_status_date_time  DateTime?
 
     @@map("schedules")
 }

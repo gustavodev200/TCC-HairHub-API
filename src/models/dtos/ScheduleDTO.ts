@@ -1,7 +1,4 @@
-import { ClientOutputDTO } from "./ClientDTO";
 import { ScheduleStatus } from "./ScheduleStatusDTO";
-import { IServiceOutputDTO } from "./ServiceDTO";
-import { EmployeeOutputDTO } from "./UserDTO";
 
 export interface SchedulesUpdateParamsDTO {
   start_date_time?: string;
@@ -10,6 +7,10 @@ export interface SchedulesUpdateParamsDTO {
   client?: string;
   employee?: string;
   schedule_status?: ScheduleStatus;
+  confirmed_status_date_time?: Date;
+  awaiting_status_date_time?: Date;
+  attend_status_date_time?: Date;
+  finished_status_date_time?: Date;
 }
 
 export interface ScheduleInputDTO {
@@ -23,6 +24,10 @@ export interface ScheduleInputDTO {
 export interface ScheduleOutputDTO extends ScheduleInputDTO {
   id?: string;
   schedule_status: ScheduleStatus;
+  confirmed_status_date_time?: Date;
+  awaiting_status_date_time?: Date;
+  attend_status_date_time?: Date;
+  finished_status_date_time?: Date;
   created_at?: Date;
   updated_at?: Date;
 }
