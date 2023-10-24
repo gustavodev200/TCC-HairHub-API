@@ -16,3 +16,11 @@ export interface ConsumptionOutputDTO extends ConsumptionInputDTO {
   created_at: Date;
   updated_at: Date;
 }
+
+export interface ParamsUpdateConsumptionDTO {
+  id: string;
+  total_amount?: number;
+  payment_type?: string;
+  products_consumption?: ConsumptionProductsConsumptionDTO[];
+  services_consumption?: string[];
+}

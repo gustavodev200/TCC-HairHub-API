@@ -2,6 +2,7 @@ import { IService } from "../interfaces";
 import {
   ConsumptionInputDTO,
   ConsumptionOutputDTO,
+  ParamsUpdateConsumptionDTO,
 } from "../models/dtos/ConsumptionDTO";
 import { ConsumptionRepository } from "../models/repositories/barbershop";
 
@@ -12,8 +13,16 @@ export class ConsumptionService implements IService {
 
     return consumption;
   }
-  async update(id: string, data: any): Promise<any> {
-    throw new Error("Method not implemented.");
+  async update(
+    id: string,
+    data: ParamsUpdateConsumptionDTO
+  ): Promise<ConsumptionOutputDTO> {
+    const consumptionToUpdate = await this.consumptionRepository.update(
+      id,
+      data
+    );
+
+    return consumptionToUpdate;
   }
   async changeStatus(id: string, status: any): Promise<any> {
     throw new Error("Method not implemented.");

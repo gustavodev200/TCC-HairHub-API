@@ -6,6 +6,8 @@ import { Consumption } from "../../domains/Consumption";
 import {
   ConsumptionInputDTO,
   ConsumptionOutputDTO,
+  ConsumptionProductsConsumptionDTO,
+  ParamsUpdateConsumptionDTO,
 } from "../../dtos/ConsumptionDTO";
 
 export class ConsumptionRepository implements IRepository {
@@ -51,8 +53,63 @@ export class ConsumptionRepository implements IRepository {
 
     return createConsumption as unknown as ConsumptionOutputDTO;
   }
-  async update(id: string, data: any): Promise<any> {
-    throw new Error("Method not implemented.");
+  async update(
+    id: string,
+    data: ParamsUpdateConsumptionDTO
+  ): Promise<ConsumptionOutputDTO> {
+    const consumptionToUpdate = await prisma.product.findUniqueOrThrow({
+      where: { id },
+    });
+
+    if (!consumptionToUpdate) {
+      throw new AppError(ErrorMessages.MSGE05, 404);
+    }
+
+    const consumption = new Consumption(
+      data.total_amount as number,
+      data.payment_type as string,
+      data.products_consumption as ConsumptionProductsConsumptionDTO[],
+      data.services_consumption as string[]
+    );
+
+    if (data.total_amount !== undefined)
+      consumption.total_amount = data.total_amount;
+    if (data.payment_type !== undefined)
+      consumption.payment_type = data.payment_type;
+    if (data.products_consumption !== undefined)
+      consumption.products_consumption = data.products_consumption;
+    if (data.services_consumption !== undefined)
+      consumption.services_consumption = data.services_consumption;
+
+    consumption.validate();
+
+    const updateConsumption = await prisma.consumption.update({
+      where: { id },
+      data: {
+        total_amount: Number(consumption.total_amount),
+        payment_type: consumption.payment_type,
+        products_consumption: {
+          create: consumption.products_consumption,
+        },
+        services_consumption: {
+          connect: consumption.services_consumption?.map((serviceId) => ({
+            id: serviceId,
+          })),
+        },
+      },
+      include: {
+        products_consumption: true,
+        services_consumption: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+          },
+        },
+      },
+    });
+
+    return updateConsumption as unknown as ConsumptionOutputDTO;
   }
   async changeStatus(id: string, status: any): Promise<any> {
     throw new Error("Method not implemented.");
