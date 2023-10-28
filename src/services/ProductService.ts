@@ -20,6 +20,10 @@ export class ProductService implements IService {
 
     return updateProduct;
   }
+
+  async list(args?: any): Promise<any> {
+    throw new Error("Method not implemented.");
+  }
   async changeStatus(id: string, status: GenericStatus) {
     const changeProductStatus = await this.productRepository.update(id, {
       status,
