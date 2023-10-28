@@ -1,4 +1,4 @@
-import { prisma } from "../..";
+import { prismaClient } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgsScheduling, IRepository } from "../../../interfaces";
 import { Schedule } from "../../domains";
@@ -21,7 +21,7 @@ export class ScheduleRepository implements IRepository {
     client,
     employee,
   }: ScheduleInputDTO): Promise<any> {
-    const availableShift = await prisma.shift.findMany({
+    const availableShift = await prismaClient.shift.findMany({
       where: {
         employee_id: employee,
         AND: [
@@ -52,7 +52,7 @@ export class ScheduleRepository implements IRepository {
     });
 
     if (availableShift.length) {
-      const timeScheduled = await prisma.scheduling.findMany({
+      const timeScheduled = await prismaClient.scheduling.findMany({
         where: {
           employee_id: employee,
           OR: [
@@ -102,7 +102,7 @@ export class ScheduleRepository implements IRepository {
 
       schedule.validate();
 
-      const scheduleCreated = await prisma.scheduling.create({
+      const scheduleCreated = await prismaClient.scheduling.create({
         data: {
           start_date_time: schedule.start_date_time,
           end_date_time: schedule.end_date_time,
@@ -130,7 +130,7 @@ export class ScheduleRepository implements IRepository {
 
   async update(id: string, data: SchedulesUpdateParamsDTO) {
     try {
-      const scheduleToUpdate = await prisma.scheduling.findUniqueOrThrow({
+      const scheduleToUpdate = await prismaClient.scheduling.findUniqueOrThrow({
         where: { id },
         include: {
           services: true,
@@ -141,7 +141,7 @@ export class ScheduleRepository implements IRepository {
         throw new AppError("Agendamento não encontrado");
       }
 
-      const availableShiftBarber = await prisma.shift.findMany({
+      const availableShiftBarber = await prismaClient.shift.findMany({
         where: {
           employee_id: data.employee,
           AND: [
@@ -172,7 +172,7 @@ export class ScheduleRepository implements IRepository {
       });
 
       if (availableShiftBarber.length) {
-        const newTimeScheduled = await prisma.scheduling.findMany({
+        const newTimeScheduled = await prismaClient.scheduling.findMany({
           where: {
             employee_id: data.employee,
             id: { not: scheduleToUpdate.id },
@@ -229,7 +229,7 @@ export class ScheduleRepository implements IRepository {
 
         schedule.validate();
 
-        const updatedSchedule = await prisma.scheduling.update({
+        const updatedSchedule = await prismaClient.scheduling.update({
           where: { id },
           data: {
             start_date_time: schedule.start_date_time,
@@ -279,7 +279,7 @@ export class ScheduleRepository implements IRepository {
 
   public async findById(id: string) {
     try {
-      const schedule = await prisma.scheduling.findUniqueOrThrow({
+      const schedule = await prismaClient.scheduling.findUniqueOrThrow({
         where: { id },
         include: {
           services: true,
@@ -310,9 +310,9 @@ export class ScheduleRepository implements IRepository {
       },
     };
 
-    const totalItems = await prisma.scheduling.count({ where });
+    const totalItems = await prismaClient.scheduling.count({ where });
 
-    const data = await prisma.scheduling.findMany({
+    const data = await prismaClient.scheduling.findMany({
       skip: args?.skip,
       take: args?.take,
       where,

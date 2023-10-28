@@ -3,7 +3,7 @@ import { ServiceBarbershop } from "../../../services/ServiceBarbershop";
 import { Cloudinary } from "../../../utils";
 import { IServiceInputDTO } from "../../../models/dtos";
 import { AppError } from "../../../errors/AppError";
-import { prisma } from "../../../models";
+import { prismaClient } from "../../../models";
 import { ErrorMessages } from "../../../errors";
 
 export class CreateServiceController {
@@ -17,7 +17,7 @@ export class CreateServiceController {
 
     const cloudinaryInstance = new Cloudinary();
 
-    const alreadyExists = await prisma.service.findUnique({
+    const alreadyExists = await prismaClient.service.findUnique({
       where: { name: data.name },
     });
 

@@ -1,4 +1,4 @@
-import { prisma } from "../..";
+import { prismaClient } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { IRepository } from "../../../interfaces";
 import { excludeFields } from "../../../utils";
@@ -26,7 +26,7 @@ export class ConsumptionRepository implements IRepository {
 
     consumption.validate();
 
-    const createConsumption = await prisma.consumption.create({
+    const createConsumption = await prismaClient.consumption.create({
       data: {
         total_amount: Number(consumption.total_amount),
         payment_type: consumption.payment_type,
@@ -57,7 +57,7 @@ export class ConsumptionRepository implements IRepository {
     id: string,
     data: ParamsUpdateConsumptionDTO
   ): Promise<ConsumptionOutputDTO> {
-    const consumptionToUpdate = await prisma.product.findUniqueOrThrow({
+    const consumptionToUpdate = await prismaClient.product.findUniqueOrThrow({
       where: { id },
     });
 
@@ -83,7 +83,7 @@ export class ConsumptionRepository implements IRepository {
 
     consumption.validate();
 
-    const updateConsumption = await prisma.consumption.update({
+    const updateConsumption = await prismaClient.consumption.update({
       where: { id },
       data: {
         total_amount: Number(consumption.total_amount),
@@ -118,7 +118,7 @@ export class ConsumptionRepository implements IRepository {
     throw new Error("Method not implemented.");
   }
   public async listAllConsumptions() {
-    const data = await prisma.consumption.findMany({
+    const data = await prismaClient.consumption.findMany({
       include: {
         products_consumption: true,
         services_consumption: {

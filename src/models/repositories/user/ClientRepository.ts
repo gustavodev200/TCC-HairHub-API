@@ -1,4 +1,4 @@
-import { prisma } from "../..";
+import { prismaClient } from "../..";
 import bcrypt from "bcrypt";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgs, FindAllReturn, IRepository } from "../../../interfaces";
@@ -21,13 +21,13 @@ import { firstAccessEmailTemplate } from "../../../utils/newPassword";
 export class ClientRepository implements IRepository {
   async create(data: ClientInputDTO) {
     try {
-      const existingClientByCpf = await prisma.client.findUnique({
+      const existingClientByCpf = await prismaClient.client.findUnique({
         where: {
           cpf: data.cpf,
         },
       });
 
-      const existingClientByEmail = await prisma.client.findUnique({
+      const existingClientByEmail = await prismaClient.client.findUnique({
         where: {
           email: data.email,
         },
@@ -73,7 +73,7 @@ export class ClientRepository implements IRepository {
 
       client.validate();
 
-      const createdClient = await prisma.client.create({
+      const createdClient = await prismaClient.client.create({
         data: {
           name: client.name,
           cpf: client.cpf,
@@ -128,7 +128,7 @@ export class ClientRepository implements IRepository {
   }
   async update(id: string, data: IUpdateClientParams) {
     try {
-      const clientToUpdate = await prisma.client.findUnique({
+      const clientToUpdate = await prismaClient.client.findUnique({
         where: { id },
         include: {
           address: true,
@@ -179,7 +179,7 @@ export class ClientRepository implements IRepository {
       client.validate();
 
       if (client.cpf !== clientToUpdate.cpf) {
-        const existingClientCPF = await prisma.client.findFirst({
+        const existingClientCPF = await prismaClient.client.findFirst({
           where: { cpf: client.cpf },
         });
 
@@ -189,7 +189,7 @@ export class ClientRepository implements IRepository {
       }
 
       if (client.email !== clientToUpdate.email) {
-        const existingClientEmail = await prisma.client.findFirst({
+        const existingClientEmail = await prismaClient.client.findFirst({
           where: { email: client.email },
         });
 
@@ -207,7 +207,7 @@ export class ClientRepository implements IRepository {
         );
       }
 
-      const updatedClient = await prisma.client.update({
+      const updatedClient = await prismaClient.client.update({
         where: { id },
         data: {
           name: client.name,
@@ -283,9 +283,9 @@ export class ClientRepository implements IRepository {
       },
     };
 
-    const totalItems = await prisma.client.count({ where });
+    const totalItems = await prismaClient.client.count({ where });
 
-    const data = await prisma.client.findMany({
+    const data = await prismaClient.client.findMany({
       where,
       include: {
         address: true,
@@ -313,7 +313,7 @@ export class ClientRepository implements IRepository {
 
   async findByEmail(email: string): Promise<UserAuth | null> {
     try {
-      const client = await prisma.client.findUniqueOrThrow({
+      const client = await prismaClient.client.findUniqueOrThrow({
         where: { email },
       });
 
@@ -331,7 +331,7 @@ export class ClientRepository implements IRepository {
 
   async findById(id: string) {
     try {
-      const client = await prisma.client.findUnique({
+      const client = await prismaClient.client.findUnique({
         where: { id },
         include: {
           scheduling: {
@@ -361,7 +361,7 @@ export class ClientRepository implements IRepository {
   }
 
   public async listAllClients() {
-    const data = await prisma.client.findMany({
+    const data = await prismaClient.client.findMany({
       where: {
         role: AssignmentType.CLIENT,
         status: GenericStatus.active,

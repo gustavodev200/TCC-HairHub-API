@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { IServiceOutputDTO } from "../../../models/dtos";
 import { ServiceBarbershop } from "../../../services/ServiceBarbershop";
 import { UpdateNewImage } from "../../../utils";
-import { prisma } from "../../../models";
+import { prismaClient } from "../../../models";
 import { AppError, ErrorMessages } from "../../../errors";
 
 export class UpdateServiceController {
@@ -14,12 +14,12 @@ export class UpdateServiceController {
     const serviceBarbershop = new ServiceBarbershop();
     const updateNewImage = new UpdateNewImage();
 
-    const serviceToUpdate = await prisma.service.findUniqueOrThrow({
+    const serviceToUpdate = await prismaClient.service.findUniqueOrThrow({
       where: { id: req.body?.id },
     });
 
     if (data.name !== serviceToUpdate.name) {
-      const alreadyExists = await prisma.service.findUnique({
+      const alreadyExists = await prismaClient.service.findUnique({
         where: { name: data.name },
       });
 

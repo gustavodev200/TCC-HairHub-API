@@ -1,4 +1,4 @@
-import { prisma } from "../..";
+import { prismaClient } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgs, IRepository } from "../../../interfaces/IRepository";
 import { excludeFields } from "../../../utils";
@@ -17,7 +17,7 @@ export class ServiceRepository implements IRepository {
     time,
     price,
   }: IServiceInputDTO): Promise<IServiceOutputDTO> {
-    const existingService = await prisma.service.findUnique({
+    const existingService = await prismaClient.service.findUnique({
       where: { name },
     });
 
@@ -29,7 +29,7 @@ export class ServiceRepository implements IRepository {
 
     service.validate();
 
-    const createdService = await prisma.service.create({
+    const createdService = await prismaClient.service.create({
       data: {
         name: service.name,
         image: service.image,
@@ -42,7 +42,7 @@ export class ServiceRepository implements IRepository {
   }
   public async update(id: string, data: IUpdateServiceParams) {
     try {
-      const serviceToUpdate = await prisma.service.findUniqueOrThrow({
+      const serviceToUpdate = await prismaClient.service.findUniqueOrThrow({
         where: { id },
       });
 
@@ -64,7 +64,7 @@ export class ServiceRepository implements IRepository {
       service.validate();
 
       if (service.name !== serviceToUpdate.name) {
-        const alreadyExists = await prisma.service.findUnique({
+        const alreadyExists = await prismaClient.service.findUnique({
           where: { name: data.name },
         });
 
@@ -72,7 +72,7 @@ export class ServiceRepository implements IRepository {
           throw new AppError(ErrorMessages.MSGE02);
         }
       }
-      const updatedService = await prisma.service.update({
+      const updatedService = await prismaClient.service.update({
         where: { id },
         data: {
           name: service.name,
@@ -107,9 +107,9 @@ export class ServiceRepository implements IRepository {
       },
     };
 
-    const totalItems = await prisma.service.count({ where });
+    const totalItems = await prismaClient.service.count({ where });
 
-    const data = await prisma.service.findMany({
+    const data = await prismaClient.service.findMany({
       where,
       skip: args?.skip,
       take: args?.take,
@@ -122,7 +122,7 @@ export class ServiceRepository implements IRepository {
   }
 
   public async listServices() {
-    const data = await prisma.service.findMany({
+    const data = await prismaClient.service.findMany({
       where: {
         status: "active",
       },

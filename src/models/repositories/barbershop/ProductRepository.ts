@@ -1,4 +1,4 @@
-import { prisma } from "../..";
+import { prismaClient } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgs, FindAllReturn, IRepository } from "../../../interfaces";
 import { excludeFields } from "../../../utils";
@@ -18,13 +18,13 @@ export class ProductRepository implements IRepository {
     amount,
     category_id,
   }: ProductInputDTO): Promise<ProductOutputDTO> {
-    const existingCategories = await prisma.category.findMany();
+    const existingCategories = await prismaClient.category.findMany();
 
     if (existingCategories.length === 0) {
       throw new AppError(ErrorMessages.MSGE019);
     }
 
-    const existingProduct = await prisma.product.findUnique({
+    const existingProduct = await prismaClient.product.findUnique({
       where: { name },
     });
 
@@ -36,7 +36,7 @@ export class ProductRepository implements IRepository {
 
     product.validate();
 
-    const createProduct = await prisma.product.create({
+    const createProduct = await prismaClient.product.create({
       data: {
         name: product.name,
         price: Number(product.price),
@@ -57,7 +57,7 @@ export class ProductRepository implements IRepository {
     id: string,
     data: UpdateParamsProductDTO
   ): Promise<ProductOutputDTO> {
-    const productToUpdate = await prisma.product.findUniqueOrThrow({
+    const productToUpdate = await prismaClient.product.findUniqueOrThrow({
       where: { id },
     });
 
@@ -83,7 +83,7 @@ export class ProductRepository implements IRepository {
 
     product.validate();
 
-    const updateProduct = await prisma.product.update({
+    const updateProduct = await prismaClient.product.update({
       where: { id },
       data: {
         name: product.name,
@@ -107,7 +107,7 @@ export class ProductRepository implements IRepository {
   }
 
   public async listOnlyProducts() {
-    const data = await prisma.product.findMany({
+    const data = await prismaClient.product.findMany({
       where: {
         status: "active",
       },

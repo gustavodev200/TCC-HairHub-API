@@ -1,4 +1,4 @@
-import { prisma } from "../..";
+import { prismaClient } from "../..";
 import bcrypt from "bcrypt";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgs, FindAllReturn, IRepository } from "../../../interfaces";
@@ -11,7 +11,6 @@ import {
   EmployeeOutputDTO,
   GenericStatus,
   IUpdateEmployeeParams,
-  ScheduleStatus,
   ShiftInputDTO,
   ShiftOutputDTO,
   UserAuth,
@@ -24,13 +23,13 @@ import dayjs from "dayjs";
 export class EmployeeRepository implements IRepository {
   async create(data: EmployeeInputDTO): Promise<EmployeeOutputDTO> {
     try {
-      const existingEmployeeByCpf = await prisma.employee.findUnique({
+      const existingEmployeeByCpf = await prismaClient.employee.findUnique({
         where: {
           cpf: data.cpf,
         },
       });
 
-      const existingEmployeeByEmail = await prisma.employee.findUnique({
+      const existingEmployeeByEmail = await prismaClient.employee.findUnique({
         where: {
           email: data.email,
         },
@@ -133,7 +132,7 @@ export class EmployeeRepository implements IRepository {
 
       for (const shiftData of data.shifts) {
         const index = data.shifts.indexOf(shiftData);
-        const shift = await prisma.shift.create({
+        const shift = await prismaClient.shift.create({
           data: {
             start_time: shiftData.start_time,
             end_time: shiftData.end_time,
@@ -153,7 +152,7 @@ export class EmployeeRepository implements IRepository {
         createdShifts.push(shift);
       }
 
-      const createdEmployee = await prisma.employee.create({
+      const createdEmployee = await prismaClient.employee.create({
         data: {
           name: employee.name,
           cpf: employee.cpf,
@@ -240,7 +239,7 @@ export class EmployeeRepository implements IRepository {
   }
   async update(id: string, data: IUpdateEmployeeParams) {
     try {
-      const employeeToUpdate = await prisma.employee.findUnique({
+      const employeeToUpdate = await prismaClient.employee.findUnique({
         where: { id },
         include: {
           address: true,
@@ -303,7 +302,7 @@ export class EmployeeRepository implements IRepository {
 
         if (shiftsToDelete.length > 0) {
           for (const shiftData of shiftsToDelete) {
-            await prisma.shift.delete({
+            await prismaClient.shift.delete({
               where: {
                 id: shiftData.id,
               },
@@ -358,7 +357,7 @@ export class EmployeeRepository implements IRepository {
             }
           }
           if (!shiftData.id) {
-            const newShift = await prisma.shift.create({
+            const newShift = await prismaClient.shift.create({
               data: {
                 start_time: shiftData.start_time,
                 end_time: shiftData.end_time,
@@ -399,7 +398,7 @@ export class EmployeeRepository implements IRepository {
                 );
 
               if (needsToUpdateAvailableDays) {
-                await prisma.availableDays.deleteMany({
+                await prismaClient.availableDays.deleteMany({
                   where: {
                     shifts: {
                       some: {
@@ -410,7 +409,7 @@ export class EmployeeRepository implements IRepository {
                 });
               }
 
-              await prisma.shift.update({
+              await prismaClient.shift.update({
                 where: {
                   id: shiftData.id,
                 },
@@ -464,7 +463,7 @@ export class EmployeeRepository implements IRepository {
       employee.validate();
 
       if (employee.cpf !== employeeToUpdate.cpf) {
-        const existingEmployee = await prisma.employee.findFirst({
+        const existingEmployee = await prismaClient.employee.findFirst({
           where: { cpf: employee.cpf },
         });
 
@@ -474,7 +473,7 @@ export class EmployeeRepository implements IRepository {
       }
 
       if (employee.email !== employeeToUpdate.email) {
-        const existingEmployee = await prisma.employee.findFirst({
+        const existingEmployee = await prismaClient.employee.findFirst({
           where: { email: employee.email },
         });
 
@@ -492,7 +491,7 @@ export class EmployeeRepository implements IRepository {
         );
       }
 
-      const updatedEmployee = await prisma.employee.update({
+      const updatedEmployee = await prismaClient.employee.update({
         where: { id },
         data: {
           name: employee.name,
@@ -601,9 +600,9 @@ export class EmployeeRepository implements IRepository {
       },
     };
 
-    const totalItems = await prisma.employee.count({ where });
+    const totalItems = await prismaClient.employee.count({ where });
 
-    const data = await prisma.employee.findMany({
+    const data = await prismaClient.employee.findMany({
       where,
       include: {
         address: true,
@@ -653,7 +652,7 @@ export class EmployeeRepository implements IRepository {
 
   async findByEmail(email: string): Promise<UserAuth | null> {
     try {
-      const employee = await prisma.employee.findUniqueOrThrow({
+      const employee = await prismaClient.employee.findUniqueOrThrow({
         where: { email },
       });
 
@@ -671,7 +670,7 @@ export class EmployeeRepository implements IRepository {
 
   async findById(id: string) {
     try {
-      const employee = await prisma.employee.findUniqueOrThrow({
+      const employee = await prismaClient.employee.findUniqueOrThrow({
         where: { id },
       });
 
@@ -682,7 +681,7 @@ export class EmployeeRepository implements IRepository {
   }
 
   public async listBarbersWithSchedule() {
-    const data = await prisma.employee.findMany({
+    const data = await prismaClient.employee.findMany({
       where: {
         role: AssignmentType.EMPLOYEE,
         status: GenericStatus.active,
@@ -734,7 +733,7 @@ export class EmployeeRepository implements IRepository {
   }
 
   public async listAllBarbers() {
-    const data = await prisma.employee.findMany({
+    const data = await prismaClient.employee.findMany({
       where: {
         role: AssignmentType.EMPLOYEE,
         status: GenericStatus.active,

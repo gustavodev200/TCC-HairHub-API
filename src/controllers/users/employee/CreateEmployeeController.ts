@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { EmployeeService } from "../../../services/user/EmployeeService";
 import { AppError, ErrorMessages } from "../../../errors";
 import { Cloudinary } from "../../../utils";
-import { prisma } from "../../../models";
+import { prismaClient } from "../../../models";
 import { EmployeeInputDTO } from "../../../models/dtos";
 
 export class CreateEmployeeController {

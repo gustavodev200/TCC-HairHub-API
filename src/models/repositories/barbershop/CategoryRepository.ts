@@ -1,4 +1,4 @@
-import { prisma } from "../..";
+import { prismaClient } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgs, FindAllReturn, IRepository } from "../../../interfaces";
 import { excludeFields } from "../../../utils";
@@ -12,7 +12,7 @@ import {
 
 export class CategoryRepository implements IRepository {
   async create({ name }: CategoryDTO): Promise<CategoryOutputDTO> {
-    const existingCategory = await prisma.category.findUnique({
+    const existingCategory = await prismaClient.category.findUnique({
       where: { name },
     });
 
@@ -24,7 +24,7 @@ export class CategoryRepository implements IRepository {
 
     category.validate();
 
-    const createCategory = await prisma.category.create({
+    const createCategory = await prismaClient.category.create({
       data: {
         name: category.name,
       },
@@ -36,7 +36,7 @@ export class CategoryRepository implements IRepository {
     id: string,
     data: UpdateParamsCategoryDTO
   ): Promise<CategoryOutputDTO> {
-    const categoryToUpdate = await prisma.category.findUniqueOrThrow({
+    const categoryToUpdate = await prismaClient.category.findUniqueOrThrow({
       where: { id },
       include: { products: true },
     });
@@ -64,7 +64,7 @@ export class CategoryRepository implements IRepository {
 
     category.validate();
 
-    const updateCategory = await prisma.category.update({
+    const updateCategory = await prismaClient.category.update({
       where: { id },
       data: {
         name: category.name,
@@ -90,9 +90,9 @@ export class CategoryRepository implements IRepository {
       },
     };
 
-    const totalItems = await prisma.category.count({ where });
+    const totalItems = await prismaClient.category.count({ where });
 
-    const data = await prisma.category.findMany({
+    const data = await prismaClient.category.findMany({
       where,
       skip: args?.skip,
       take: args?.take,
@@ -105,7 +105,7 @@ export class CategoryRepository implements IRepository {
   }
 
   async listCategoriesWithProducts(args?: FindAllArgs | undefined) {
-    const categoriesWithProducts = await prisma.category.findMany({
+    const categoriesWithProducts = await prismaClient.category.findMany({
       where: {
         products: {
           some: {
@@ -175,7 +175,7 @@ export class CategoryRepository implements IRepository {
       ],
     };
 
-    const data = await prisma.category.findMany({
+    const data = await prismaClient.category.findMany({
       where,
     });
 
