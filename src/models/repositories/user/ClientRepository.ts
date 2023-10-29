@@ -382,4 +382,25 @@ export class ClientRepository implements IRepository {
 
     return dataToUse as unknown as ClientOutputDTO[];
   }
+
+  async getBarberDetails(employee_id: string) {
+    const barber = await prismaClient.employee.findUnique({
+      where: { id: employee_id },
+    });
+
+    if (!barber) {
+      throw new Error("Barber not found");
+    }
+
+    const dataToUse = {
+      ...excludeFields(barber, [
+        "created_at",
+        "updated_at",
+        "password",
+        "address_id",
+      ]),
+    };
+
+    return dataToUse;
+  }
 }

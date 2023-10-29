@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `schedules` ADD COLUMN `canceled_status_date_time` DATETIME(3) NULL,
+    ADD COLUMN `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    ADD COLUMN `updated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);

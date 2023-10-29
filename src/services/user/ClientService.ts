@@ -51,4 +51,10 @@ export class ClientService implements IService {
 
     return result as unknown as ClientOutputDTO;
   }
+
+  async getBarberDetails(employee_id: string): Promise<EmployeeOutputDTO> {
+    const result = await this.clientService.getBarberDetails(employee_id);
+
+    return result as unknown as EmployeeOutputDTO;
+  }
 }

@@ -1,13 +1,14 @@
 import { z } from "zod";
 import { AppError } from "../../errors";
-import { ConsumptionProductsConsumptionDTO } from "../dtos/ConsumptionDTO";
+import { ProductsConsumedDTO } from "../dtos/ConsumptionDTO";
 
 export class Consumption {
   constructor(
     private _total_amount: number,
     private _payment_type: string,
-    private _products_consumption: ConsumptionProductsConsumptionDTO[],
+    private _products_consumption: ProductsConsumedDTO[],
     private _services_consumption: string[],
+    private _scheduling_id: string,
     private _id?: string
   ) {}
 
@@ -31,6 +32,10 @@ export class Consumption {
     return this._id!;
   }
 
+  get scheduling_id() {
+    return this._scheduling_id;
+  }
+
   set id(id: string) {
     this._id = id;
   }
@@ -39,13 +44,15 @@ export class Consumption {
     this._total_amount = total_amount;
   }
 
+  set scheduling_id(scheduling_id: string) {
+    this._scheduling_id = scheduling_id;
+  }
+
   set payment_type(payment_type: string) {
     this._payment_type = payment_type;
   }
 
-  set products_consumption(
-    products_consumption: ConsumptionProductsConsumptionDTO[]
-  ) {
+  set products_consumption(products_consumption: ProductsConsumedDTO[]) {
     this._products_consumption = products_consumption;
   }
 
@@ -59,6 +66,7 @@ export class Consumption {
       payment_type: this.payment_type,
       products_consumption: this.products_consumption,
       services_consumption: this.services_consumption,
+      scheduling_id: this.scheduling_id,
     };
   }
 
@@ -69,7 +77,7 @@ export class Consumption {
         total_amount: z.number(),
         payment_type: z.string(),
       })
-      .partial({ id: true, status: true });
+      .partial({ id: true, status: true, payment_type: true });
 
     try {
       consumptionSchema.parse(this);

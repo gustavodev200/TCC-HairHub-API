@@ -1,14 +1,15 @@
-export interface ConsumptionProductsConsumptionDTO {
-  name: string;
+export interface ProductsConsumedDTO {
+  id: string;
   quantity: number;
-  price: number;
+  product_id: string;
 }
 
 export interface ConsumptionInputDTO {
-  products_consumption: ConsumptionProductsConsumptionDTO[];
+  products_consumption: ProductsConsumedDTO[];
   services_consumption: string[];
   total_amount: number;
-  payment_type: string;
+  payment_type?: string;
+  scheduling_id: string;
 }
 
 export interface ConsumptionOutputDTO extends ConsumptionInputDTO {
@@ -21,6 +22,7 @@ export interface ParamsUpdateConsumptionDTO {
   id: string;
   total_amount?: number;
   payment_type?: string;
-  products_consumption?: ConsumptionProductsConsumptionDTO[];
+  products_consumption?: ProductsConsumedDTO[];
   services_consumption?: string[];
+  scheduling_id?: string;
 }

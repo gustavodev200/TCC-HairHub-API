@@ -119,6 +119,22 @@ export class ScheduleRepository implements IRepository {
           services: true,
           employee: true,
           client: true,
+          consumption: {
+            include: {
+              products_consumption: {
+                include: {
+                  product: true,
+                },
+              },
+              services_consumption: {
+                select: {
+                  id: true,
+                  name: true,
+                  price: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -263,6 +279,22 @@ export class ScheduleRepository implements IRepository {
             services: true,
             employee: true,
             client: true,
+            consumption: {
+              include: {
+                products_consumption: {
+                  include: {
+                    product: true,
+                  },
+                },
+                services_consumption: {
+                  select: {
+                    id: true,
+                    name: true,
+                    price: true,
+                  },
+                },
+              },
+            },
           },
         });
 
@@ -283,6 +315,22 @@ export class ScheduleRepository implements IRepository {
         where: { id },
         include: {
           services: true,
+          consumption: {
+            include: {
+              products_consumption: {
+                include: {
+                  product: true,
+                },
+              },
+              services_consumption: {
+                select: {
+                  id: true,
+                  name: true,
+                  price: true,
+                },
+              },
+            },
+          },
         },
       });
 
