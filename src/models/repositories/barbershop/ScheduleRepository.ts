@@ -274,6 +274,10 @@ export class ScheduleRepository implements IRepository {
               data.schedule_status === "finished"
                 ? new Date().toISOString()
                 : undefined,
+            canceled_status_date_time:
+              data.schedule_status === "canceled"
+                ? new Date().toISOString()
+                : undefined,
           },
           include: {
             services: true,

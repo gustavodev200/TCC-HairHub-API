@@ -20,7 +20,7 @@ export class ConsumptionRepository implements IRepository {
   }: ConsumptionInputDTO): Promise<ConsumptionOutputDTO> {
     const consumption = new Consumption(
       total_amount as number,
-      payment_type as string,
+      payment_type === null ? "" : payment_type || "",
       products_consumption,
       services_consumption,
       scheduling_id
@@ -94,7 +94,7 @@ export class ConsumptionRepository implements IRepository {
 
     const consumption = new Consumption(
       data.total_amount as number,
-      data.payment_type as string,
+      data.payment_type === null ? "" : data.payment_type || "",
       data.products_consumption as ProductsConsumedDTO[],
       data.services_consumption as string[],
       data.scheduling_id as string
@@ -102,7 +102,7 @@ export class ConsumptionRepository implements IRepository {
 
     if (data.total_amount !== undefined)
       consumption.total_amount = data.total_amount;
-    if (data.payment_type !== undefined)
+    if (data.payment_type !== undefined && data.payment_type !== null)
       consumption.payment_type = data.payment_type;
     if (data.products_consumption !== undefined)
       consumption.products_consumption = data.products_consumption;
@@ -111,7 +111,22 @@ export class ConsumptionRepository implements IRepository {
 
     consumption.validate();
 
-    const productsConsumedToUpdate: ProductsConsumedDTO[] = [];
+    const productsConsumedToUpdate =
+      data.products_consumption?.flatMap<ProductsConsumedDTO>((product) => {
+        if (!product.id) {
+          return [];
+        }
+
+        const consumed = consumptionToUpdate.products_consumption?.find(
+          (consumed) => consumed.id === product.id
+        );
+
+        if (JSON.stringify(consumed) === JSON.stringify(product)) {
+          return [];
+        }
+
+        return product;
+      }) || [];
     const newProductsConsumedList: string[] = [];
 
     if (data.products_consumption) {
@@ -145,16 +160,6 @@ export class ConsumptionRepository implements IRepository {
           newProductsConsumedList.push(newProductConsumed.id);
         }
       }
-
-      for (let i = 0; i < data.products_consumption.length; i++) {
-        if (
-          JSON.stringify(data.products_consumption[i]) !==
-          JSON.stringify(consumptionToUpdate.products_consumption?.[i])
-        ) {
-          productsConsumedToUpdate.push(data.products_consumption[i]);
-        }
-      }
-      //aqui o bixo pega
 
       if (productsConsumedToUpdate.length > 0) {
         for (const productsConsumedData of productsConsumedToUpdate) {
