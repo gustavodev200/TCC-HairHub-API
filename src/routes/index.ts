@@ -10,6 +10,7 @@ import { scheduleRoutes } from "./schedule.routes";
 import { consumptionRoutes } from "./consumption.routes";
 import { authenticatedAdmin } from "../middlewares/authenticatedAdmin";
 import { authenticatedManager } from "../middlewares/authenticatedManager";
+import { commentRoutes } from "./comment.routes";
 
 const routes = Router();
 
@@ -59,6 +60,9 @@ routes.use(
   authenticatedManager,
   scheduleRoutes
 );
+
+routes.use("/comments", authenticationHandler, commentRoutes);
+
 routes.use("/auth", authRoutes);
 
 export { routes };

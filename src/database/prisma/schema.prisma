@@ -61,6 +61,7 @@ model Employee {
     shifts     Shift[]
     created_at DateTime       @default(now())
     updated_at DateTime       @updatedAt
+    Comment    Comment[]
 
     @@map("employees")
 }
@@ -103,6 +104,7 @@ model Client {
     created_at DateTime       @default(now())
     updated_at DateTime       @updatedAt
     scheduling Scheduling[]
+    comments   Comment[]
 
     @@map("clients")
 }
@@ -195,4 +197,17 @@ model Scheduling {
     updated_at                 DateTime       @default(now()) @updatedAt
 
     @@map("schedules")
+}
+
+model Comment {
+    id          String   @id @default(uuid())
+    content     String   @db.Text
+    client      Client   @relation(fields: [client_id], references: [id])
+    client_id   String
+    employee    Employee @relation(fields: [employee_id], references: [id])
+    employee_id String
+    created_at  DateTime @default(now())
+    updated_at  DateTime @updatedAt
+
+    @@map("comments")
 }

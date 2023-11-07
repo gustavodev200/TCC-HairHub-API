@@ -8,3 +8,4 @@ export * from "./ClientDTO";
 export * from "./ScheduleDTO";
 export * from "./ScheduleStatusDTO";
 export * from "./ShiftDTO";
+export * from "./CommentDTO";

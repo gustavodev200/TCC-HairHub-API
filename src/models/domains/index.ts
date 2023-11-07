@@ -9,3 +9,5 @@ export * from "./Category";
 export * from "./Client";
 export * from "./Schedule";
 export * from "./Shift";
+export * from "./Consumption";
+export * from "./Comment";
