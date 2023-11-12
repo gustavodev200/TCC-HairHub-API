@@ -7,6 +7,7 @@ export class Comment {
     private _content: string,
     private _client: CommentClientDTO,
     private _employee: CommentEmployeeDTO,
+    private _star: number,
     private _id?: string
   ) {}
 
@@ -20,6 +21,10 @@ export class Comment {
 
   get client() {
     return this._client;
+  }
+
+  get star() {
+    return this._star;
   }
 
   get employee() {
@@ -38,6 +43,10 @@ export class Comment {
     this._client = client;
   }
 
+  set star(star: number) {
+    this._star = star;
+  }
+
   set employee(employee: CommentEmployeeDTO) {
     this._employee = employee;
   }
@@ -47,6 +56,7 @@ export class Comment {
       content: this.content,
       client: this.client,
       employee: this.employee,
+      star: this.star,
     };
   }
 

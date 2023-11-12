@@ -11,6 +11,7 @@ import { consumptionRoutes } from "./consumption.routes";
 import { authenticatedAdmin } from "../middlewares/authenticatedAdmin";
 import { authenticatedManager } from "../middlewares/authenticatedManager";
 import { commentRoutes } from "./comment.routes";
+import { reportsRoutes } from "./reports.routes";
 
 const routes = Router();
 
@@ -62,6 +63,8 @@ routes.use(
 );
 
 routes.use("/comments", authenticationHandler, commentRoutes);
+
+routes.use("/reports", authenticationHandler, reportsRoutes);
 
 routes.use("/auth", authRoutes);
 

@@ -206,6 +206,7 @@ model Comment {
     client_id   String
     employee    Employee @relation(fields: [employee_id], references: [id])
     employee_id String
+    star        Int
     created_at  DateTime @default(now())
     updated_at  DateTime @updatedAt
 

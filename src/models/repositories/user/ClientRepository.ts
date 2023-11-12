@@ -337,6 +337,11 @@ export class ClientRepository implements IRepository {
           scheduling: {
             include: {
               services: true,
+              consumption: {
+                select: {
+                  total_amount: true,
+                },
+              },
               employee: {
                 select: {
                   id: true,

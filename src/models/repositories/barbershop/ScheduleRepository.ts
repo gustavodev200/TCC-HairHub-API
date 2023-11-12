@@ -24,6 +24,7 @@ export class ScheduleRepository implements IRepository {
     const availableShift = await prismaClient.shift.findMany({
       where: {
         employee_id: employee,
+
         AND: [
           {
             start_time: {
@@ -55,6 +56,9 @@ export class ScheduleRepository implements IRepository {
       const timeScheduled = await prismaClient.scheduling.findMany({
         where: {
           employee_id: employee,
+          schedule_status: {
+            notIn: [ScheduleStatus.CANCELED, ScheduleStatus.FINISHED],
+          },
           OR: [
             {
               start_date_time: {
@@ -381,6 +385,17 @@ export class ScheduleRepository implements IRepository {
             name: true,
           },
         },
+        consumption: {
+          select: {
+            services_consumption: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+              },
+            },
+          },
+        },
         services: {
           select: {
             id: true,
@@ -395,7 +410,14 @@ export class ScheduleRepository implements IRepository {
     });
 
     return {
-      data,
+      data: data.map((schedule) => ({
+        ...schedule,
+        services:
+          schedule.consumption?.services_consumption &&
+          schedule.consumption?.services_consumption.length > 0
+            ? schedule.consumption?.services_consumption
+            : schedule.services,
+      })),
       totalItems,
     };
   }

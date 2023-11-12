@@ -15,6 +15,7 @@ export interface CommentInputDTO {
   content: string;
   client: CommentClientDTO;
   employee: CommentEmployeeDTO;
+  star: number;
 }
 
 export interface CommentOutputDTO extends CommentInputDTO {

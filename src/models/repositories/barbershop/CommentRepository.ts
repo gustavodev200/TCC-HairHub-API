@@ -6,7 +6,7 @@ import { Comment } from "../../domains";
 import { CommentInputDTO, CommentOutputDTO } from "../../dtos";
 
 export class CommentRepository implements IRepository {
-  async create({ content, client, employee }: CommentInputDTO) {
+  async create({ content, client, employee, star }: CommentInputDTO) {
     try {
       const existingComment = await prismaClient.comment.findFirst({
         where: {
@@ -18,7 +18,7 @@ export class CommentRepository implements IRepository {
         throw new AppError(ErrorMessages.MSGE02);
       }
 
-      const comment = new Comment(content, client, employee);
+      const comment = new Comment(content, client, employee, star);
 
       comment.validate();
 
@@ -35,6 +35,7 @@ export class CommentRepository implements IRepository {
               id: comment.employee.id,
             },
           },
+          star: comment.star,
         },
 
         include: {
