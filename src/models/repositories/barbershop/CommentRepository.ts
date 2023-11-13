@@ -11,6 +11,7 @@ export class CommentRepository implements IRepository {
       const existingComment = await prismaClient.comment.findFirst({
         where: {
           employee_id: employee.id,
+          client_id: client.id,
         },
       });
 
