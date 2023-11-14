@@ -4,6 +4,7 @@ import {
   AverageRatingReport,
   DetailedTotalReport,
   ReportsDTO,
+  TotalSchedulesByStatus,
 } from "../../dtos/ReportDTO";
 import { AssignmentType } from "@prisma/client";
 import { ScheduleStatus } from "../../dtos";
@@ -60,16 +61,27 @@ export class ReportRepository {
     const previousTotalSchedules = previousSchedules.length;
 
     const waitingAvaregeTime = schedules.map((schedule) => {
-      return dayjs(schedule.attend_status_date_time).diff(
-        schedule.awaiting_status_date_time,
-        "minutes"
-      );
+      if (
+        schedule.attend_status_date_time &&
+        schedule.awaiting_status_date_time
+      ) {
+        return dayjs(schedule.attend_status_date_time).diff(
+          schedule.awaiting_status_date_time,
+          "minutes"
+        );
+      }
+
+      return 0;
     });
 
     const waitingAvaregeTimeTotal =
       waitingAvaregeTime.reduce((a, b) => {
         return a + b;
       }) / schedules.length;
+
+    const formattedWaitingAvaregeTimeTotal = parseFloat(
+      waitingAvaregeTimeTotal.toFixed(2)
+    );
 
     const previousAvaregeTime = previousSchedules.map((schedule) => {
       return dayjs(schedule.attend_status_date_time).diff(
@@ -85,16 +97,26 @@ export class ReportRepository {
 
     //Tempo médio de execução de serviço
     const averageServiceExecutionTime = schedules.map((schedule) => {
-      return dayjs(schedule.attend_status_date_time).diff(
-        schedule.finished_status_date_time,
-        "minutes"
-      );
+      if (
+        schedule.finished_status_date_time &&
+        schedule.attend_status_date_time
+      ) {
+        return dayjs(schedule.attend_status_date_time).diff(
+          schedule.finished_status_date_time,
+          "minutes"
+        );
+      }
+      return 0;
     });
 
     const averageServiceExecutionTimeTotal =
       averageServiceExecutionTime.reduce((a, b) => {
         return a + b;
       }) / schedules.length;
+
+    const formattedAverageServiceExecutionTimeTotal = parseFloat(
+      averageServiceExecutionTimeTotal.toFixed(2)
+    );
 
     const previousAverageServiceTime = previousSchedules.map((schedule) => {
       return dayjs(schedule.attend_status_date_time).diff(
@@ -107,6 +129,53 @@ export class ReportRepository {
       averageServiceExecutionTime.reduce((a, b) => {
         return a + b;
       }) / schedules.length;
+
+    //Numero Total de Agendamentos por status (Agendado, Aguardando Atend.,confirmados, Em Atendimento, Finalizado, Cancelado).
+
+    const totalSchedulesByStatus: TotalSchedulesByStatus[] = [];
+    const totalSchedulesByStatusPrevious: TotalSchedulesByStatus[] = [];
+
+    const statusCount: Record<ScheduleStatus, number> = {
+      [ScheduleStatus.SCHEDULED]: 0,
+      [ScheduleStatus.CONFIRMED]: 0,
+      [ScheduleStatus.AWAITING_SERVICE]: 0,
+      [ScheduleStatus.ATTEND]: 0,
+      [ScheduleStatus.FINISHED]: 0,
+      [ScheduleStatus.CANCELED]: 0,
+    };
+
+    const statusCountPrevious: Record<ScheduleStatus, number> = {
+      [ScheduleStatus.SCHEDULED]: 0,
+      [ScheduleStatus.CONFIRMED]: 0,
+      [ScheduleStatus.AWAITING_SERVICE]: 0,
+      [ScheduleStatus.ATTEND]: 0,
+      [ScheduleStatus.FINISHED]: 0,
+      [ScheduleStatus.CANCELED]: 0,
+    };
+
+    schedules.forEach((schedule) => {
+      statusCount[schedule.schedule_status] += 1;
+    });
+
+    previousSchedules.forEach((schedule) => {
+      statusCountPrevious[schedule.schedule_status] += 1;
+    });
+
+    for (const status in statusCount) {
+      const count = statusCount[status as ScheduleStatus];
+      const countPrevious = statusCountPrevious[status as ScheduleStatus];
+      const total = schedules.length;
+
+      totalSchedulesByStatus.push({
+        status: status as ScheduleStatus,
+        total: count,
+      });
+
+      totalSchedulesByStatusPrevious.push({
+        status: status as ScheduleStatus,
+        total: countPrevious,
+      });
+    }
 
     //Desempenho Individual dos Barbeiros - Número de agendamentos concluídos por cada barbeiro.
 
@@ -200,6 +269,8 @@ export class ReportRepository {
       return total + (schedule.consumption?.total_amount || 0);
     }, 0);
 
+    const formattedTotalRevenue = parseFloat(totalRevenue.toFixed(2));
+
     const previousSchedulesRevenue = previousSchedules.reduce(
       (total, schedule) => {
         return total + (schedule?.consumption?.total_amount || 0);
@@ -209,20 +280,70 @@ export class ReportRepository {
 
     //Trazer o tipo de pagamento mais utilizado e a porcentagem de utilização
 
+    const paymentTypesCount: Record<string, number> = {};
+    const previousPaymentTypesCount: Record<string, number> = {};
+
+    schedules.forEach((schedule) => {
+      const paymentType =
+        schedule.consumption?.payment_type || "Não especificado";
+
+      if (!paymentTypesCount[paymentType]) {
+        paymentTypesCount[paymentType] = 1;
+      } else {
+        paymentTypesCount[paymentType]++;
+      }
+    });
+
+    previousSchedules.forEach((schedule) => {
+      const paymentType =
+        schedule.consumption?.payment_type || "Não especificado";
+
+      if (!previousPaymentTypesCount[paymentType]) {
+        previousPaymentTypesCount[paymentType] = 1;
+      } else {
+        previousPaymentTypesCount[paymentType]++;
+      }
+    });
+
+    const calculatePaymentTypesPercentage = (
+      count: Record<string, number>,
+      totalSchedules: number
+    ): DetailedTotalReport[] => {
+      const percentage: DetailedTotalReport[] = [];
+
+      for (const paymentType in count) {
+        const countOfType = count[paymentType];
+        const porcentageFormat = (countOfType / totalSchedules) * 100;
+        const formattedPorcentage = parseFloat(porcentageFormat.toFixed(2));
+        percentage.push({
+          name: paymentType,
+          total: countOfType,
+          porcentage: formattedPorcentage,
+          id: "",
+        });
+      }
+
+      return percentage;
+    };
+
+    const paymentTypesPercentage: DetailedTotalReport[] =
+      calculatePaymentTypesPercentage(paymentTypesCount, totalSchedules);
+
     const report: ReportsDTO = {
+      totalSchedulesByStatus: totalSchedulesByStatus,
       totalSchedules: {
         total: totalSchedules,
         porcentage:
           (totalSchedules - previousTotalSchedules) / previousTotalSchedules,
       },
       averageWaitingTime: {
-        average: waitingAvaregeTimeTotal,
+        average: formattedWaitingAvaregeTimeTotal,
         porcentage:
           (waitingAvaregeTimeTotal - previousWaitingAvaregeTimeTotal) /
           previousWaitingAvaregeTimeTotal,
       },
       averageServiceTime: {
-        average: averageServiceExecutionTimeTotal,
+        average: formattedAverageServiceExecutionTimeTotal,
         porcentage:
           (averageServiceExecutionTimeTotal - previousAvaregeServiceTimeTotal) /
           previousAvaregeServiceTimeTotal,
@@ -230,10 +351,11 @@ export class ReportRepository {
       executedServicesByBarber,
       averageRatingByBarber: averageRatingsByBarber,
       totalRevenue: {
-        total: totalRevenue,
+        total: formattedTotalRevenue,
         porcentage:
           (totalRevenue - previousSchedulesRevenue) / previousSchedulesRevenue,
       },
+      mostUsedPaymentMethods: paymentTypesPercentage,
     };
 
     return report;
