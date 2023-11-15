@@ -6,7 +6,7 @@ import { ReportsDTO } from "../../../models/dtos/ReportDTO";
 class GetReportsController {
   async handle(req: Request, res: Response) {
     const { startDate, endDate } = req.query;
-    const { role } = req.user;
+    const { role, id } = req.user;
 
     if (
       !startDate ||
@@ -37,7 +37,8 @@ class GetReportsController {
     if (role === "employee") {
       result = await reportService.getBarberReport(
         validatedStartDate,
-        validatedEndDate
+        validatedEndDate,
+        id
       );
     }
 

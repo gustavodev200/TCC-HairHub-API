@@ -8,6 +8,7 @@ import {
 } from "../../dtos/ReportDTO";
 import { AssignmentType } from "@prisma/client";
 import { ScheduleStatus } from "../../dtos";
+import { translateSchedulesStatus } from "../../../utils/translateSchedulesStatus";
 
 export class ReportRepository {
   async getAdminReport(start_date: string, end_date: string) {
@@ -77,7 +78,7 @@ export class ReportRepository {
     const waitingAvaregeTimeTotal =
       waitingAvaregeTime.reduce((a, b) => {
         return a + b;
-      }) / schedules.length;
+      }, 0) / schedules.length;
 
     const formattedWaitingAvaregeTimeTotal = parseFloat(
       waitingAvaregeTimeTotal.toFixed(2)
@@ -91,9 +92,9 @@ export class ReportRepository {
     });
 
     const previousWaitingAvaregeTimeTotal =
-      waitingAvaregeTime.reduce((a, b) => {
+      previousAvaregeTime.reduce((a, b) => {
         return a + b;
-      }) / schedules.length;
+      }, 0) / schedules.length;
 
     //Tempo médio de execução de serviço
     const averageServiceExecutionTime = schedules.map((schedule) => {
@@ -101,8 +102,8 @@ export class ReportRepository {
         schedule.finished_status_date_time &&
         schedule.attend_status_date_time
       ) {
-        return dayjs(schedule.attend_status_date_time).diff(
-          schedule.finished_status_date_time,
+        return dayjs(schedule.finished_status_date_time).diff(
+          schedule.attend_status_date_time,
           "minutes"
         );
       }
@@ -112,53 +113,51 @@ export class ReportRepository {
     const averageServiceExecutionTimeTotal =
       averageServiceExecutionTime.reduce((a, b) => {
         return a + b;
-      }) / schedules.length;
+      }, 0) / schedules.length;
 
     const formattedAverageServiceExecutionTimeTotal = parseFloat(
       averageServiceExecutionTimeTotal.toFixed(2)
     );
 
     const previousAverageServiceTime = previousSchedules.map((schedule) => {
-      return dayjs(schedule.attend_status_date_time).diff(
-        schedule.finished_status_date_time,
+      return dayjs(schedule.finished_status_date_time).diff(
+        schedule.attend_status_date_time,
         "minutes"
       );
     });
 
     const previousAvaregeServiceTimeTotal =
-      averageServiceExecutionTime.reduce((a, b) => {
+      previousAverageServiceTime.reduce((a, b) => {
         return a + b;
-      }) / schedules.length;
+      }, 0) / schedules.length;
 
     //Numero Total de Agendamentos por status (Agendado, Aguardando Atend.,confirmados, Em Atendimento, Finalizado, Cancelado).
+
+    const targetStatuses = [ScheduleStatus.FINISHED, ScheduleStatus.CANCELED];
 
     const totalSchedulesByStatus: TotalSchedulesByStatus[] = [];
     const totalSchedulesByStatusPrevious: TotalSchedulesByStatus[] = [];
 
-    const statusCount: Record<ScheduleStatus, number> = {
-      [ScheduleStatus.SCHEDULED]: 0,
-      [ScheduleStatus.CONFIRMED]: 0,
-      [ScheduleStatus.AWAITING_SERVICE]: 0,
-      [ScheduleStatus.ATTEND]: 0,
+    const statusCount: Record<string, number> = {
       [ScheduleStatus.FINISHED]: 0,
       [ScheduleStatus.CANCELED]: 0,
     };
 
-    const statusCountPrevious: Record<ScheduleStatus, number> = {
-      [ScheduleStatus.SCHEDULED]: 0,
-      [ScheduleStatus.CONFIRMED]: 0,
-      [ScheduleStatus.AWAITING_SERVICE]: 0,
-      [ScheduleStatus.ATTEND]: 0,
+    const statusCountPrevious: Record<string, number> = {
       [ScheduleStatus.FINISHED]: 0,
       [ScheduleStatus.CANCELED]: 0,
     };
 
     schedules.forEach((schedule) => {
-      statusCount[schedule.schedule_status] += 1;
+      if (targetStatuses.includes(schedule.schedule_status as ScheduleStatus)) {
+        statusCount[schedule.schedule_status] += 1;
+      }
     });
 
     previousSchedules.forEach((schedule) => {
-      statusCountPrevious[schedule.schedule_status] += 1;
+      if (targetStatuses.includes(schedule.schedule_status as ScheduleStatus)) {
+        statusCountPrevious[schedule.schedule_status] += 1;
+      }
     });
 
     for (const status in statusCount) {
@@ -265,7 +264,6 @@ export class ReportRepository {
     //Rentabilidade e Receitas: Valor total geral entrado na Barbearia. (Dia, Mes, Semana)
 
     const totalRevenue = schedules.reduce((total, schedule) => {
-      // Suponha que cada agendamento tenha um campo 'amount' representando o valor pago pelo cliente
       return total + (schedule.consumption?.total_amount || 0);
     }, 0);
 
@@ -330,7 +328,10 @@ export class ReportRepository {
       calculatePaymentTypesPercentage(paymentTypesCount, totalSchedules);
 
     const report: ReportsDTO = {
-      totalSchedulesByStatus: totalSchedulesByStatus,
+      totalSchedulesByStatus: totalSchedulesByStatus.map((item) => ({
+        ...item,
+        status: translateSchedulesStatus(item.status),
+      })),
       totalSchedules: {
         total: totalSchedules,
         porcentage:
@@ -361,8 +362,271 @@ export class ReportRepository {
     return report;
   }
 
-  async getBarberReport(start_date: string, end_date: string) {
-    return null;
+  async getBarberReport(start_date: string, end_date: string, id: string) {
+    const schedules = await prismaClient.scheduling.findMany({
+      where: {
+        employee: {
+          id: id,
+        },
+        start_date_time: {
+          gte: start_date,
+          lte: end_date,
+        },
+      },
+      include: {
+        consumption: {
+          select: {
+            total_amount: true,
+            payment_type: true,
+          },
+        },
+        services: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    const totalSchedules = schedules.length;
+
+    const diffInDays = dayjs(end_date).diff(dayjs(start_date), "days");
+    const diffInHours = dayjs(end_date).diff(dayjs(start_date), "hours");
+    const period = diffInDays > 0 ? diffInDays : diffInHours;
+
+    const previousPeriodEndDate = dayjs(start_date)
+      .subtract(1, "day")
+      .toISOString();
+    const previousPeriodStartDate = dayjs(previousPeriodEndDate)
+      .subtract(period, diffInDays > 0 ? "days" : "hours")
+      .toISOString();
+
+    const previousSchedules = await prismaClient.scheduling.findMany({
+      where: {
+        employee: {
+          id: id,
+        },
+        start_date_time: {
+          gte: previousPeriodStartDate,
+          lte: previousPeriodEndDate,
+        },
+      },
+      include: {
+        consumption: {
+          select: {
+            total_amount: true,
+            payment_type: true,
+          },
+        },
+      },
+    });
+
+    const previousTotalSchedules = previousSchedules.length;
+
+    //Rentabilidade e Receitas: Valor total geral entrado na Barbearia. (Dia, Mes, Semana)
+
+    const totalRevenue = schedules.reduce((total, schedule) => {
+      // Suponha que cada agendamento tenha um campo 'amount' representando o valor pago pelo cliente
+      return total + (schedule.consumption?.total_amount || 0);
+    }, 0);
+
+    const formattedTotalRevenue = parseFloat(totalRevenue.toFixed(2));
+
+    const previousSchedulesRevenue = previousSchedules.reduce(
+      (total, schedule) => {
+        return total + (schedule?.consumption?.total_amount || 0);
+      },
+      0
+    );
+
+    //Tempo médio desde o cara estar Aguardando Atendimento à ser Atendido.
+    const waitingAvaregeTime = schedules.map((schedule) => {
+      if (
+        schedule.attend_status_date_time &&
+        schedule.awaiting_status_date_time
+      ) {
+        return dayjs(schedule.attend_status_date_time).diff(
+          schedule.awaiting_status_date_time,
+          "minutes"
+        );
+      }
+
+      return 0;
+    });
+
+    const waitingAvaregeTimeTotal =
+      waitingAvaregeTime.reduce((a, b) => {
+        return a + b;
+      }) / schedules.length;
+
+    const formattedWaitingAvaregeTimeTotal = parseFloat(
+      waitingAvaregeTimeTotal.toFixed(2)
+    );
+
+    const previousAvaregeTime = previousSchedules.map((schedule) => {
+      return dayjs(schedule.attend_status_date_time).diff(
+        schedule.awaiting_status_date_time,
+        "minutes"
+      );
+    });
+
+    const previousWaitingAvaregeTimeTotal =
+      waitingAvaregeTime.reduce((a, b) => {
+        return a + b;
+      }) / schedules.length;
+
+    //Tempo médio de execução de serviço
+    const averageServiceExecutionTime = schedules.map((schedule) => {
+      if (
+        schedule.finished_status_date_time &&
+        schedule.attend_status_date_time
+      ) {
+        return dayjs(schedule.attend_status_date_time).diff(
+          schedule.finished_status_date_time,
+          "minutes"
+        );
+      }
+      return 0;
+    });
+
+    const averageServiceExecutionTimeTotal =
+      averageServiceExecutionTime.reduce((a, b) => {
+        return a + b;
+      }) / schedules.length;
+
+    const formattedAverageServiceExecutionTimeTotal = parseFloat(
+      averageServiceExecutionTimeTotal.toFixed(2)
+    );
+
+    const previousAverageServiceTime = previousSchedules.map((schedule) => {
+      return dayjs(schedule.attend_status_date_time).diff(
+        schedule.finished_status_date_time,
+        "minutes"
+      );
+    });
+
+    const previousAvaregeServiceTimeTotal =
+      averageServiceExecutionTime.reduce((a, b) => {
+        return a + b;
+      }) / schedules.length;
+
+    //Média de avaliação do barbeiro pelos feedbacks dos clientes: Listar os comentários
+
+    const userId = id;
+
+    const comments = await prismaClient.comment.findMany({
+      where: {
+        employee_id: userId,
+      },
+    });
+
+    const ratingsByBarber: Record<string, number[]> = {};
+
+    for (const comment of comments) {
+      const { employee_id, star } = comment;
+
+      if (!ratingsByBarber[employee_id]) {
+        ratingsByBarber[employee_id] = [];
+      }
+
+      ratingsByBarber[employee_id].push(star);
+    }
+
+    const averageRatingsByBarber: AverageRatingReport[] = [];
+
+    const barbers = await prismaClient.employee.findMany({
+      where: {
+        id: {
+          in: Object.keys(ratingsByBarber),
+        },
+        role: AssignmentType.employee,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    // Agora, você pode continuar com a lógica de cálculo de média como antes
+    for (const barber of barbers) {
+      const barberId = barber.id;
+      const barberRatings = ratingsByBarber[barberId] || [];
+
+      const totalRatings = barberRatings.length;
+
+      const averageRating =
+        totalRatings > 0
+          ? barberRatings.reduce((sum, rating) => sum + rating, 0) /
+            totalRatings
+          : 0;
+
+      averageRatingsByBarber.push({
+        id: barberId,
+        name: barber.name,
+        average: averageRating,
+      });
+    }
+
+    //serviços mais requerido pelos clientes
+    const servicesFrequency: Record<string, number> = {};
+
+    // Contar a frequência de cada serviço agendado
+    for (const schedule of schedules) {
+      const serviceNames = schedule.services.map((service) => service.name);
+
+      // Iterar sobre os nomes dos serviços e contar a frequência
+      for (const serviceName of serviceNames) {
+        if (!servicesFrequency[serviceName]) {
+          servicesFrequency[serviceName] = 1;
+        } else {
+          servicesFrequency[serviceName]++;
+        }
+      }
+    }
+
+    // Ordenar os serviços por frequência em ordem decrescente
+    const sortedServices = Object.entries(servicesFrequency).sort(
+      (a, b) => b[1] - a[1]
+    );
+
+    const topServices: DetailedTotalReport[] = sortedServices
+      .slice(0, 5)
+      .map(([name, frequency]) => ({
+        id: schedules.length > 0 ? schedules[0].services[0].id : "",
+        name,
+        total: frequency,
+        porcentage: (frequency / totalSchedules) * 100,
+      }));
+
+    const report: ReportsDTO = {
+      totalSchedules: {
+        total: totalSchedules,
+        porcentage:
+          (totalSchedules - previousTotalSchedules) / previousTotalSchedules,
+      },
+      totalRevenue: {
+        total: formattedTotalRevenue,
+        porcentage:
+          (totalRevenue - previousSchedulesRevenue) / previousSchedulesRevenue,
+      },
+      averageWaitingTime: {
+        average: formattedWaitingAvaregeTimeTotal,
+        porcentage:
+          (waitingAvaregeTimeTotal - previousWaitingAvaregeTimeTotal) /
+          previousWaitingAvaregeTimeTotal,
+      },
+      averageServiceTime: {
+        average: formattedAverageServiceExecutionTimeTotal,
+        porcentage:
+          (averageServiceExecutionTimeTotal - previousAvaregeServiceTimeTotal) /
+          previousAvaregeServiceTimeTotal,
+      },
+      averageRatingByBarber: averageRatingsByBarber,
+      mostUsedServices: topServices,
+    };
+
+    return report;
   }
 
   async getAttendReport(start_date: string, end_date: string) {

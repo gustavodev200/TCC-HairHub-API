@@ -23,7 +23,7 @@ export interface AverageTimeReport {
 
 export interface TotalSchedulesByStatus {
   total: number;
-  status: ScheduleStatus;
+  status: string;
 }
 
 export interface ReportsDTO {

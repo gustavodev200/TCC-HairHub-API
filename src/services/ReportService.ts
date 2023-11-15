@@ -7,8 +7,8 @@ export class ReportService {
     return this.reportRepository.getAdminReport(start_date, end_date);
   }
 
-  async getBarberReport(start_date: string, end_date: string) {
-    return this.reportRepository.getBarberReport(start_date, end_date);
+  async getBarberReport(start_date: string, end_date: string, id: string) {
+    return this.reportRepository.getBarberReport(start_date, end_date, id);
   }
 
   async getAttendReport(start_date: string, end_date: string) {
