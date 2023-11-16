@@ -7,8 +7,10 @@ import {
   TotalSchedulesByStatus,
 } from "../../dtos/ReportDTO";
 import { AssignmentType } from "@prisma/client";
-import { ScheduleStatus } from "../../dtos";
+import { ScheduleOutputDTO, ScheduleStatus } from "../../dtos";
 import { translateSchedulesStatus } from "../../../utils/translateSchedulesStatus";
+import { translatePaymentTypes } from "../../../utils/translatePaymentTypes";
+import { abbreviateFullName } from "../../../utils/abbreviateFullName";
 
 export class ReportRepository {
   async getAdminReport(start_date: string, end_date: string) {
@@ -338,25 +340,36 @@ export class ReportRepository {
           (totalSchedules - previousTotalSchedules) / previousTotalSchedules,
       },
       averageWaitingTime: {
-        average: formattedWaitingAvaregeTimeTotal,
+        average: Math.round(formattedWaitingAvaregeTimeTotal),
         porcentage:
           (waitingAvaregeTimeTotal - previousWaitingAvaregeTimeTotal) /
           previousWaitingAvaregeTimeTotal,
       },
       averageServiceTime: {
-        average: formattedAverageServiceExecutionTimeTotal,
+        average: Math.round(formattedAverageServiceExecutionTimeTotal),
         porcentage:
           (averageServiceExecutionTimeTotal - previousAvaregeServiceTimeTotal) /
           previousAvaregeServiceTimeTotal,
       },
-      executedServicesByBarber,
-      averageRatingByBarber: averageRatingsByBarber,
+      executedServicesByBarber: executedServicesByBarber.map((item) => ({
+        ...item,
+        name: abbreviateFullName(item.name),
+      })),
+      averageRatingByBarber: averageRatingsByBarber
+        .map((item) => ({
+          ...item,
+          name: abbreviateFullName(item.name),
+        }))
+        .sort((a, b) => b.average - a.average),
       totalRevenue: {
         total: formattedTotalRevenue,
         porcentage:
           (totalRevenue - previousSchedulesRevenue) / previousSchedulesRevenue,
       },
-      mostUsedPaymentMethods: paymentTypesPercentage,
+      mostUsedPaymentMethods: paymentTypesPercentage.map((item) => ({
+        ...item,
+        name: translatePaymentTypes(item.name),
+      })),
     };
 
     return report;
@@ -598,6 +611,8 @@ export class ReportRepository {
         total: frequency,
         porcentage: (frequency / totalSchedules) * 100,
       }));
+
+    //Trazer os agendamentos Finalizados e Cancelados do Barbeiro
 
     const report: ReportsDTO = {
       totalSchedules: {
