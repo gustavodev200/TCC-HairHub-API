@@ -30,12 +30,6 @@ routes.use(
   categoryRoutes
 );
 routes.use(
-  "/products",
-  authenticationHandler,
-  authenticatedAdmin,
-  productRoutes
-);
-routes.use(
   "/services",
   authenticationHandler,
   authenticatedManager,
@@ -48,22 +42,11 @@ routes.use(
   authenticatedManager,
   clientRoutes
 );
+routes.use("/products", authenticationHandler, productRoutes);
 
-routes.use(
-  "/consumptions",
-  authenticationHandler,
-  authenticatedManager,
-  consumptionRoutes
-);
-routes.use(
-  "/schedulings",
-  authenticationHandler,
-  authenticatedManager,
-  scheduleRoutes
-);
-
+routes.use("/consumptions", authenticationHandler, consumptionRoutes);
+routes.use("/schedulings", authenticationHandler, scheduleRoutes);
 routes.use("/comments", authenticationHandler, commentRoutes);
-
 routes.use("/reports", authenticationHandler, reportsRoutes);
 
 routes.use("/auth", authRoutes);

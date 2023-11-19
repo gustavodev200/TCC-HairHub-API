@@ -49,11 +49,15 @@ export class PaginatedResponseSchedule<T> {
       filters.filterByEmployee = req.query.filterByEmployee as string;
     }
 
+    const isAdmin = req.user.role === "admin";
+    const isEmployee = req.user.role === "employee";
+
     const { data, totalItems } = await this.service.list({
       skip,
       take: pageSize,
       ...filters,
-      itemsToExclude: [req.user.id],
+      itemsToExclude: isAdmin ? [req.user.id] : undefined,
+      filterByEmployee: isEmployee ? req.user.id : filters.filterByEmployee,
     });
 
     const response: PaginatedDataResponseScheduleDTO<T> = {

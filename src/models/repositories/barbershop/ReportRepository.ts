@@ -614,6 +614,64 @@ export class ReportRepository {
 
     //Trazer os agendamentos Finalizados e Cancelados do Barbeiro
 
+    const targetStatuses = [ScheduleStatus.FINISHED, ScheduleStatus.CANCELED];
+
+    // Supondo que você tenha o ID do barbeiro na variável 'barberId'
+    const barberId = id; // Substitua com a lógica real para obter o ID da sessão
+
+    // Filtrar os agendamentos para o barbeiro específico
+    const schedulesForBarber = schedules.filter((schedule) => {
+      return (
+        targetStatuses.includes(schedule.schedule_status as ScheduleStatus) &&
+        schedule.employee_id === barberId
+      );
+    });
+
+    const previousSchedulesForBarber = previousSchedules.filter((schedule) => {
+      return (
+        targetStatuses.includes(schedule.schedule_status as ScheduleStatus) &&
+        schedule.employee_id === barberId
+      );
+    });
+
+    // Restante do código permanece inalterado
+    const statusCount: Record<string, number> = {
+      [ScheduleStatus.FINISHED]: 0,
+      [ScheduleStatus.CANCELED]: 0,
+    };
+
+    const statusCountPrevious: Record<string, number> = {
+      [ScheduleStatus.FINISHED]: 0,
+      [ScheduleStatus.CANCELED]: 0,
+    };
+
+    schedulesForBarber.forEach((schedule) => {
+      statusCount[schedule.schedule_status] += 1;
+    });
+
+    previousSchedulesForBarber.forEach((schedule) => {
+      statusCountPrevious[schedule.schedule_status] += 1;
+    });
+
+    const totalSchedulesByStatus: TotalSchedulesByStatus[] = [];
+    const totalSchedulesByStatusPrevious: TotalSchedulesByStatus[] = [];
+
+    for (const status in statusCount) {
+      const count = statusCount[status as ScheduleStatus];
+      const countPrevious = statusCountPrevious[status as ScheduleStatus];
+      const total = schedules.length; // Certifique-se de que isso está correto
+
+      totalSchedulesByStatus.push({
+        status: status as ScheduleStatus,
+        total: count,
+      });
+
+      totalSchedulesByStatusPrevious.push({
+        status: status as ScheduleStatus,
+        total: countPrevious,
+      });
+    }
+
     const report: ReportsDTO = {
       totalSchedules: {
         total: totalSchedules,
@@ -639,6 +697,10 @@ export class ReportRepository {
       },
       averageRatingByBarber: averageRatingsByBarber,
       mostUsedServices: topServices,
+      totalSchedulesByStatus: totalSchedulesByStatus.map((item) => ({
+        ...item,
+        status: translateSchedulesStatus(item.status),
+      })),
     };
 
     return report;

@@ -17,6 +17,7 @@ export type FindAllArgsScheduling = {
   filterByEmployee?: string;
   filterByDate?: string;
   itemsToExclude?: string[];
+  itemsToInclude?: string[];
 };
 
 export type FindAllReturn = {
