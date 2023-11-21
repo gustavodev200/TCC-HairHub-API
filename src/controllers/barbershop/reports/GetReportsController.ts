@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { ReportService } from "../../../services/ReportService";
 import dayjs from "dayjs";
 import { ReportsDTO } from "../../../models/dtos/ReportDTO";
+import { AssignmentType } from "@prisma/client";
 
 class GetReportsController {
   async handle(req: Request, res: Response) {
@@ -27,14 +28,14 @@ class GetReportsController {
       validatedEndDate
     );
 
-    if (role === "attend") {
+    if (role === AssignmentType.attendant) {
       result = await reportService.getAttendReport(
         validatedStartDate,
         validatedEndDate
       );
     }
 
-    if (role === "employee") {
+    if (role === AssignmentType.employee) {
       result = await reportService.getBarberReport(
         validatedStartDate,
         validatedEndDate,

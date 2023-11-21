@@ -707,6 +707,183 @@ export class ReportRepository {
   }
 
   async getAttendReport(start_date: string, end_date: string) {
-    return null;
+    const schedules = await prismaClient.scheduling.findMany({
+      where: {
+        start_date_time: {
+          gte: start_date,
+          lte: end_date,
+        },
+      },
+      include: {
+        consumption: {
+          select: {
+            total_amount: true,
+            payment_type: true,
+          },
+        },
+      },
+    });
+
+    const totalSchedules = schedules.length;
+
+    const diffInDays = dayjs(end_date).diff(dayjs(start_date), "days");
+    const diffInHours = dayjs(end_date).diff(dayjs(start_date), "hours");
+    const period = diffInDays > 0 ? diffInDays : diffInHours;
+
+    const previousPeriodEndDate = dayjs(start_date)
+      .subtract(1, "day")
+      .toISOString();
+    const previousPeriodStartDate = dayjs(previousPeriodEndDate)
+      .subtract(period, diffInDays > 0 ? "days" : "hours")
+      .toISOString();
+
+    const previousSchedules = await prismaClient.scheduling.findMany({
+      where: {
+        start_date_time: {
+          gte: previousPeriodStartDate,
+          lte: previousPeriodEndDate,
+        },
+      },
+      include: {
+        consumption: {
+          select: {
+            total_amount: true,
+            payment_type: true,
+          },
+        },
+      },
+    });
+
+    const previousTotalSchedules = previousSchedules.length;
+
+    const scheduledSchedules = await prismaClient.scheduling.findMany({
+      where: {
+        start_date_time: {
+          gte: start_date,
+          lte: end_date,
+        },
+        schedule_status: ScheduleStatus.SCHEDULED,
+      },
+    });
+
+    const totalScheduledSchedules = scheduledSchedules.length;
+
+    const waitingForService = await prismaClient.scheduling.findMany({
+      where: {
+        start_date_time: {
+          gte: start_date,
+          lte: end_date,
+        },
+        schedule_status: ScheduleStatus.AWAITING_SERVICE,
+      },
+    });
+
+    const totalwaitingForService = waitingForService.length;
+
+    const waitingAvaregeTime = schedules.map((schedule) => {
+      if (
+        schedule.attend_status_date_time &&
+        schedule.awaiting_status_date_time
+      ) {
+        return dayjs(schedule.attend_status_date_time).diff(
+          schedule.awaiting_status_date_time,
+          "minutes"
+        );
+      }
+
+      return 0;
+    });
+
+    const waitingAvaregeTimeTotal =
+      waitingAvaregeTime.reduce((a, b) => {
+        return a + b;
+      }, 0) / schedules.length;
+
+    const formattedWaitingAvaregeTimeTotal = parseFloat(
+      waitingAvaregeTimeTotal.toFixed(2)
+    );
+
+    const previousAvaregeTime = previousSchedules.map((schedule) => {
+      return dayjs(schedule.attend_status_date_time).diff(
+        schedule.awaiting_status_date_time,
+        "minutes"
+      );
+    });
+
+    const previousWaitingAvaregeTimeTotal =
+      previousAvaregeTime.reduce((a, b) => {
+        return a + b;
+      }, 0) / schedules.length;
+
+    //Tempo médio de execução de serviço
+    const averageServiceExecutionTime = schedules.map((schedule) => {
+      if (
+        schedule.finished_status_date_time &&
+        schedule.attend_status_date_time
+      ) {
+        return dayjs(schedule.finished_status_date_time).diff(
+          schedule.attend_status_date_time,
+          "minutes"
+        );
+      }
+      return 0;
+    });
+
+    const averageServiceExecutionTimeTotal =
+      averageServiceExecutionTime.reduce((a, b) => {
+        return a + b;
+      }, 0) / schedules.length;
+
+    const formattedAverageServiceExecutionTimeTotal = parseFloat(
+      averageServiceExecutionTimeTotal.toFixed(2)
+    );
+
+    const previousAverageServiceTime = previousSchedules.map((schedule) => {
+      return dayjs(schedule.finished_status_date_time).diff(
+        schedule.attend_status_date_time,
+        "minutes"
+      );
+    });
+
+    const previousAvaregeServiceTimeTotal =
+      previousAverageServiceTime.reduce((a, b) => {
+        return a + b;
+      }, 0) / schedules.length;
+
+    //trazer Agendamentos com status scheduled
+
+    const report: ReportsDTO = {
+      totalSchedules: {
+        total: totalSchedules,
+        porcentage:
+          (totalSchedules - previousTotalSchedules) / previousTotalSchedules,
+      },
+      averageWaitingTime: {
+        average: formattedWaitingAvaregeTimeTotal,
+        porcentage:
+          (waitingAvaregeTimeTotal - previousWaitingAvaregeTimeTotal) /
+          previousWaitingAvaregeTimeTotal,
+      },
+      averageServiceTime: {
+        average: formattedAverageServiceExecutionTimeTotal,
+        porcentage:
+          (averageServiceExecutionTimeTotal - previousAvaregeServiceTimeTotal) /
+          previousAvaregeServiceTimeTotal,
+      },
+      schedulesWaitingConfirmation: {
+        total: totalScheduledSchedules,
+        porcentage:
+          (totalScheduledSchedules - previousTotalSchedules) /
+          previousTotalSchedules,
+      },
+      schedulesWaitingForService: {
+        total: totalwaitingForService,
+        porcentage:
+          (totalwaitingForService - previousTotalSchedules) /
+          previousTotalSchedules,
+      },
+    };
+
+    return report;
   }
 }

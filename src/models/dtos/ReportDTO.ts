@@ -27,7 +27,7 @@ export interface TotalSchedulesByStatus {
 }
 
 export interface ReportsDTO {
-  totalSchedulesByStatus: TotalSchedulesByStatus[];
+  totalSchedulesByStatus?: TotalSchedulesByStatus[];
   averageWaitingTime: AverageTimeReport;
   totalSchedules: TotalReports;
   averageServiceTime: AverageTimeReport;
@@ -37,4 +37,6 @@ export interface ReportsDTO {
   mostUsedPaymentMethods?: DetailedTotalReport[];
   averageRating?: AverageRatingReport;
   mostUsedServices?: DetailedTotalReport[];
+  schedulesWaitingConfirmation?: TotalReports;
+  schedulesWaitingForService?: TotalReports;
 }
