@@ -13,7 +13,11 @@ import { translatePaymentTypes } from "../../../utils/translatePaymentTypes";
 import { abbreviateFullName } from "../../../utils/abbreviateFullName";
 
 export class ReportRepository {
-  async getAdminReport(start_date: string, end_date: string) {
+  async getAdminReport(
+    start_date: string,
+    end_date: string,
+    barberId?: string
+  ) {
     const schedules = await prismaClient.scheduling.findMany({
       where: {
         start_date_time: {
@@ -329,6 +333,16 @@ export class ReportRepository {
     const paymentTypesPercentage: DetailedTotalReport[] =
       calculatePaymentTypesPercentage(paymentTypesCount, totalSchedules);
 
+    let barberReports: ReportsDTO | undefined;
+
+    if (barberId) {
+      barberReports = await this.getBarberReport(
+        start_date,
+        end_date,
+        barberId
+      );
+    }
+
     const report: ReportsDTO = {
       totalSchedulesByStatus: totalSchedulesByStatus.map((item) => ({
         ...item,
@@ -371,6 +385,13 @@ export class ReportRepository {
         name: translatePaymentTypes(item.name),
       })),
     };
+
+    if (barberReports) {
+      return {
+        ...report,
+        ...barberReports,
+      };
+    }
 
     return report;
   }
@@ -471,7 +492,7 @@ export class ReportRepository {
     const waitingAvaregeTimeTotal =
       waitingAvaregeTime.reduce((a, b) => {
         return a + b;
-      }) / schedules.length;
+      }, 0) / schedules.length;
 
     const formattedWaitingAvaregeTimeTotal = parseFloat(
       waitingAvaregeTimeTotal.toFixed(2)
@@ -487,7 +508,7 @@ export class ReportRepository {
     const previousWaitingAvaregeTimeTotal =
       waitingAvaregeTime.reduce((a, b) => {
         return a + b;
-      }) / schedules.length;
+      }, 0) / schedules.length;
 
     //Tempo médio de execução de serviço
     const averageServiceExecutionTime = schedules.map((schedule) => {
@@ -506,7 +527,7 @@ export class ReportRepository {
     const averageServiceExecutionTimeTotal =
       averageServiceExecutionTime.reduce((a, b) => {
         return a + b;
-      }) / schedules.length;
+      }, 0) / schedules.length;
 
     const formattedAverageServiceExecutionTimeTotal = parseFloat(
       averageServiceExecutionTimeTotal.toFixed(2)
@@ -522,7 +543,7 @@ export class ReportRepository {
     const previousAvaregeServiceTimeTotal =
       averageServiceExecutionTime.reduce((a, b) => {
         return a + b;
-      }) / schedules.length;
+      }, 0) / schedules.length;
 
     //Média de avaliação do barbeiro pelos feedbacks dos clientes: Listar os comentários
 

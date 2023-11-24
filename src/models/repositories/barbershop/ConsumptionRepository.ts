@@ -217,7 +217,15 @@ export class ConsumptionRepository implements IRepository {
   public async listAllConsumptions() {
     const data = await prismaClient.consumption.findMany({
       include: {
-        products_consumption: true,
+        products_consumption: {
+          include: {
+            product: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
         services_consumption: {
           select: {
             id: true,
@@ -230,6 +238,13 @@ export class ConsumptionRepository implements IRepository {
 
     const dataToUse = data.map((consumption) => ({
       ...excludeFields(consumption, ["created_at", "updated_at"]),
+      products_consumption: consumption.products_consumption?.map(
+        (product) => ({
+          ...excludeFields(product, ["product"]),
+
+          name: product.product.name,
+        })
+      ),
     }));
 
     return dataToUse as unknown as ConsumptionOutputDTO[];

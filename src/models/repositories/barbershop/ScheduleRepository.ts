@@ -1,6 +1,7 @@
 import { prismaClient } from "../..";
 import { AppError, ErrorMessages } from "../../../errors";
 import { FindAllArgsScheduling, IRepository } from "../../../interfaces";
+import { excludeFields } from "../../../utils";
 import { Schedule } from "../../domains";
 import {
   ScheduleInputDTO,
@@ -387,6 +388,17 @@ export class ScheduleRepository implements IRepository {
         },
         consumption: {
           select: {
+            total_amount: true,
+            products_consumption: {
+              include: {
+                product: {
+                  select: {
+                    name: true,
+                    price: true,
+                  },
+                },
+              },
+            },
             services_consumption: {
               select: {
                 id: true,
@@ -412,6 +424,18 @@ export class ScheduleRepository implements IRepository {
     return {
       data: data.map((schedule) => ({
         ...schedule,
+        consumption: schedule.consumption
+          ? {
+              ...schedule.consumption,
+              products_consumption:
+                schedule.consumption?.products_consumption?.map((product) => ({
+                  ...excludeFields(product, ["product"]),
+
+                  name: product.product.name,
+                  price: product.product.price,
+                })),
+            }
+          : undefined,
         services:
           schedule.consumption?.services_consumption &&
           schedule.consumption?.services_consumption.length > 0

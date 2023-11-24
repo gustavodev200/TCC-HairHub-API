@@ -6,7 +6,7 @@ import { AssignmentType } from "@prisma/client";
 
 class GetReportsController {
   async handle(req: Request, res: Response) {
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate, barberId } = req.query;
     const { role, id } = req.user;
 
     if (
@@ -25,7 +25,8 @@ class GetReportsController {
 
     let result: ReportsDTO | null = await reportService.getAdminReport(
       validatedStartDate,
-      validatedEndDate
+      validatedEndDate,
+      barberId as string | undefined
     );
 
     if (role === AssignmentType.attendant) {

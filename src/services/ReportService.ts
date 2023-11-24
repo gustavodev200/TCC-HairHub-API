@@ -3,8 +3,8 @@ import { ReportRepository } from "../models/repositories/barbershop/ReportReposi
 export class ReportService {
   private reportRepository = new ReportRepository();
 
-  async getAdminReport(start_date: string, end_date: string) {
-    return this.reportRepository.getAdminReport(start_date, end_date);
+  async getAdminReport(start_date: string, end_date: string, barberId?: string) {
+    return this.reportRepository.getAdminReport(start_date, end_date, barberId);
   }
 
   async getBarberReport(start_date: string, end_date: string, id: string) {
