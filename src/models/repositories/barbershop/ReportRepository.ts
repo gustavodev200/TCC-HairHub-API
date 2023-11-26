@@ -11,6 +11,7 @@ import { ScheduleOutputDTO, ScheduleStatus } from "../../dtos";
 import { translateSchedulesStatus } from "../../../utils/translateSchedulesStatus";
 import { translatePaymentTypes } from "../../../utils/translatePaymentTypes";
 import { abbreviateFullName } from "../../../utils/abbreviateFullName";
+import { ensureNonNegative } from "../../../utils/ensureNonNegative";
 
 export class ReportRepository {
   async getAdminReport(
@@ -354,13 +355,17 @@ export class ReportRepository {
           (totalSchedules - previousTotalSchedules) / previousTotalSchedules,
       },
       averageWaitingTime: {
-        average: Math.round(formattedWaitingAvaregeTimeTotal),
+        average: ensureNonNegative(
+          Math.round(formattedWaitingAvaregeTimeTotal)
+        ),
         porcentage:
           (waitingAvaregeTimeTotal - previousWaitingAvaregeTimeTotal) /
           previousWaitingAvaregeTimeTotal,
       },
       averageServiceTime: {
-        average: Math.round(formattedAverageServiceExecutionTimeTotal),
+        average: ensureNonNegative(
+          Math.round(formattedAverageServiceExecutionTimeTotal)
+        ),
         porcentage:
           (averageServiceExecutionTimeTotal - previousAvaregeServiceTimeTotal) /
           previousAvaregeServiceTimeTotal,
@@ -705,13 +710,13 @@ export class ReportRepository {
           (totalRevenue - previousSchedulesRevenue) / previousSchedulesRevenue,
       },
       averageWaitingTime: {
-        average: formattedWaitingAvaregeTimeTotal,
+        average: ensureNonNegative(formattedWaitingAvaregeTimeTotal),
         porcentage:
           (waitingAvaregeTimeTotal - previousWaitingAvaregeTimeTotal) /
           previousWaitingAvaregeTimeTotal,
       },
       averageServiceTime: {
-        average: formattedAverageServiceExecutionTimeTotal,
+        average: ensureNonNegative(formattedAverageServiceExecutionTimeTotal),
         porcentage:
           (averageServiceExecutionTimeTotal - previousAvaregeServiceTimeTotal) /
           previousAvaregeServiceTimeTotal,
@@ -880,13 +885,13 @@ export class ReportRepository {
           (totalSchedules - previousTotalSchedules) / previousTotalSchedules,
       },
       averageWaitingTime: {
-        average: formattedWaitingAvaregeTimeTotal,
+        average: ensureNonNegative(formattedWaitingAvaregeTimeTotal),
         porcentage:
           (waitingAvaregeTimeTotal - previousWaitingAvaregeTimeTotal) /
           previousWaitingAvaregeTimeTotal,
       },
       averageServiceTime: {
-        average: formattedAverageServiceExecutionTimeTotal,
+        average: ensureNonNegative(formattedAverageServiceExecutionTimeTotal),
         porcentage:
           (averageServiceExecutionTimeTotal - previousAvaregeServiceTimeTotal) /
           previousAvaregeServiceTimeTotal,
