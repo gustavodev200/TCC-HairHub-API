@@ -22,7 +22,7 @@ export class PaginatedResponseSchedule<T> {
       throw new AppError("O tamanho da página deve ser um número");
     }
 
-    const pageSize = req.query.pageSize ? Number(req.query.pageSize) : 10;
+    const pageSize = req.query.pageSize ? Number(req.query.pageSize) : 7;
     const page = req.query.page ? Number(req.query.page) : 1;
     const skip = (page - 1) * pageSize;
 
